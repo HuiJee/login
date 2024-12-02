@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <div th:insert="~{fragment/header}"></div>
+</head>
+<body>
+<div class="d-flex" id="wrapper">
+
+    <!-- Page content wrapper-->
+    <div id="page-content-wrapper">
+
+        <!-- Page content-->
+        <div class="container-fluid mt-5">
+            <div class="col-xl-12">
+                <div class="row align-items-center ">
+                    <div class="card login-card border-0">
+                        <div class="card-body d-flex justify-content-center">
+                            <div class="col-xl-6">
+                                <div class="auth-form">
+                                    <h3 class="text-start mb-4 font-w600" th:text="${target} == 'id' ? '아이디 찾기' : '비밀번호 찾기'"></h3>
+
+                                    <!-- 아이디 또는 비밀번호 찾기 -->
+                                    <form id="find-form">
+                                        <input class="find-target" type="hidden" th:value="${target}">
+                                        <div th:if="${target == 'id'}" class="form-group mb-3">
+                                            <label class="mb-1 text-black">Name<span class="required">*</span></label>
+                                            <input type="text" class="form-control find-input" id="user_name">
+                                        </div>
+                                        <div th:if="${target != 'id'}" class="form-group mb-3">
+                                            <label class="mb-1 text-black">ID<span class="required">*</span></label>
+                                            <input type="text" class="form-control find-input" id="user_log_id">
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label class="mb-1 text-black">Email<span class="required">*</span></label>
+                                            <input type="email" class="form-control find-input" id="user_email">
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label class="mb-1 text-black">Telephone<span class="required">*</span></label>
+                                            <input type="tel" class="form-control find-input" id="user_tel">
+                                        </div>
+                                        <div class="text-end mt-4 mb-3">
+                                            <button type="submit" class="btn btn-outline-success btn-block">찾기</button>
+                                        </div>
+                                    </form>
+
+                                    <!-- 찾은 아이디 보여주기 -->
+                                    <div id="show-id" class="d-none">
+                                        <div class="form-group mb-3">
+                                            <div class="col-xl-12">
+                                                <p>회원님의 정보가 <span class="text-success">확인</span>되었습니다.</p>
+                                                <div class="d-flex">
+                                                    <span class="align-self-center col-2 fw-bold">ID</span>
+                                                    <input class="form-control w-100 fw-bold bg-transparent user-id-info" disabled>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- pw 찾기 용 메일 인증 -->
+                                    <form id="mail-check-form" class="d-none">
+                                        <span>회원가입 시 등록한 <span class="text-success">메일</span>로 <span class="text-decoration-underline">인증번호가 발송</span>되었습니다.</span>
+                                        <div class="form-group d-flex mt-3 mb-3">
+                                            <label class="col-2 align-self-center fw-bold">인증번호</label>
+                                            <input type="text" class="form-control find-input col-8" id="mail_check">
+                                            <!-- 유효시간 -->
+                                            <div id="countdown" class="text-danger align-self-center ms-2 col-1"></div>
+                                        </div>
+                                        <div class="text-end mt-4 mb-3">
+                                            <button type="submit" class="btn btn-outline-success btn-block mail-check-btn">인증</button>
+                                        </div>
+                                    </form>
+
+                                    <!-- 인증 후 비밀번호 변경 -->
+                                    <form id="change-pw-form" class="d-none">
+                                        <span>새 비밀번호를 등록하세요.</span>
+                                        <div class="form-group d-flex mt-3 mb-3">
+                                            <label class="col-2 align-self-center">새 비밀번호</label>
+                                            <input type="text" class="form-control find-input" id="new_pw">
+                                        </div>
+                                        <div class="form-group d-flex mb-3">
+                                            <label class="col-2 align-self-center">비밀번호 확인</label>
+                                            <input type="text" class="form-control find-input" id="new_pw_check">
+                                        </div>
+                                        <div class="text-end mt-4 mb-3">
+                                            <button type="submit" class="btn btn-outline-success btn-block change-pw-btn">변경</button>
+                                        </div>
+                                    </form>
+
+                                    <div class="new-account mt-5 d-flex align-items-center justify-content-between flex-wrap">
+                                        <small class="mb-0">회원이신가요? <a class="text-primary" th:href="@{/login/generic}">로그인</a></small>
+                                        <small class="mb-0">회원이 아니신가요? <a class="text-primary" th:href="@{/user/register}">회원가입</a></small>
+                                        <small class="mb-0" th:if="${target != 'id'}"><a class="text-primary" th:href="@{/login/find/id}">아이디 찾기</a></small>
+                                        <small class="mb-0" th:if="${target == 'id'}"><a class="text-primary" th:href="@{/login/find/pw}">비밀번호 찾기</a></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal modal-sm fade align-content-center" style="display: none;" id="noUserModal" tabindex="-1" aria-labelledby="noUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-center">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title fs-5 text-danger" id="noUserModalLabel">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-circle" viewBox="0 0 16 16">
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                        <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+                    </svg>
+                    Caution</h3>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-xl-12">
+                        <p>존재하지 않는 회원입니다.</p>
+                        <p>다시 시도해주세요.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger light ok-btn" data-bs-dismiss="modal">확인</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>
+
