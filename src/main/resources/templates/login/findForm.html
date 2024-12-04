@@ -5,93 +5,94 @@
     <div th:insert="~{fragment/header}"></div>
 </head>
 <body>
-<div class="d-flex" id="wrapper">
+    <div class="d-flex" id="wrapper">
 
-    <!-- Page content wrapper-->
-    <div id="page-content-wrapper">
+        <!-- Page content wrapper-->
+        <div id="page-content-wrapper">
 
-        <!-- Page content-->
-        <div class="container-fluid mt-5">
-            <div class="col-xl-12">
-                <div class="row align-items-center ">
-                    <div class="card login-card border-0">
-                        <div class="card-body d-flex justify-content-center">
-                            <div class="col-xl-6">
-                                <div class="auth-form">
-                                    <h3 class="text-start mb-4 font-w600" th:text="${target} == 'id' ? '아이디 찾기' : '비밀번호 찾기'"></h3>
+            <!-- Page content-->
+            <div class="container-fluid mt-5">
+                <div class="col-xl-12">
+                    <div class="row align-items-center ">
+                        <div class="card login-card border-0">
+                            <div class="card-body d-flex justify-content-center">
+                                <div class="col-xl-6">
+                                    <div class="auth-form">
+                                        <h3 class="text-start mb-4 font-w600" th:text="${target} == 'id' ? '아이디 찾기' : '비밀번호 찾기'"></h3>
 
-                                    <!-- 아이디 또는 비밀번호 찾기 -->
-                                    <form id="find-form">
-                                        <input class="find-target" type="hidden" th:value="${target}">
-                                        <div th:if="${target == 'id'}" class="form-group mb-3">
-                                            <label class="mb-1 text-black">Name<span class="required">*</span></label>
-                                            <input type="text" class="form-control find-input" id="user_name">
-                                        </div>
-                                        <div th:if="${target != 'id'}" class="form-group mb-3">
-                                            <label class="mb-1 text-black">ID<span class="required">*</span></label>
-                                            <input type="text" class="form-control find-input" id="user_log_id">
-                                        </div>
-                                        <div class="form-group mb-3">
-                                            <label class="mb-1 text-black">Email<span class="required">*</span></label>
-                                            <input type="email" class="form-control find-input" id="user_email">
-                                        </div>
-                                        <div class="form-group mb-3">
-                                            <label class="mb-1 text-black">Telephone<span class="required">*</span></label>
-                                            <input type="tel" class="form-control find-input" id="user_tel">
-                                        </div>
-                                        <div class="text-end mt-4 mb-3">
-                                            <button type="submit" class="btn btn-outline-success btn-block">찾기</button>
-                                        </div>
-                                    </form>
+                                        <!-- 아이디 또는 비밀번호 찾기 -->
+                                        <form id="find-form">
+                                            <input class="find-target" type="hidden" th:value="${target}">
+                                            <div th:if="${target == 'id'}" class="form-group mb-3">
+                                                <label class="mb-1 text-black">Name<span class="required">*</span></label>
+                                                <input type="text" class="form-control find-input" id="user_name">
+                                            </div>
+                                            <div th:if="${target != 'id'}" class="form-group mb-3">
+                                                <label class="mb-1 text-black">ID<span class="required">*</span></label>
+                                                <input type="text" class="form-control find-input" id="user_log_id">
+                                            </div>
+                                            <div class="form-group mb-3">
+                                                <label class="mb-1 text-black">Email<span class="required">*</span></label>
+                                                <input type="email" class="form-control find-input" id="user_email">
+                                            </div>
+                                            <div class="form-group mb-3">
+                                                <label class="mb-1 text-black">Telephone<span class="required">*</span></label>
+                                                <input type="tel" class="form-control find-input" id="user_tel">
+                                            </div>
+                                            <div class="text-end mt-4 mb-3">
+                                                <button type="submit" class="btn btn-outline-success btn-block">찾기</button>
+                                            </div>
+                                        </form>
 
-                                    <!-- 찾은 아이디 보여주기 -->
-                                    <div id="show-id" class="d-none">
-                                        <div class="form-group mb-3">
-                                            <div class="col-xl-12">
-                                                <p>회원님의 정보가 <span class="text-success">확인</span>되었습니다.</p>
-                                                <div class="d-flex">
-                                                    <span class="align-self-center col-2 fw-bold">ID</span>
-                                                    <input class="form-control w-100 fw-bold bg-transparent user-id-info" disabled>
+                                        <!-- 찾은 아이디 보여주기 -->
+                                        <div id="show-id" class="d-none">
+                                            <div class="form-group mb-3">
+                                                <div class="col-xl-12">
+                                                    <p>회원님의 정보가 <span class="text-success">확인</span>되었습니다.</p>
+                                                    <div class="d-flex">
+                                                        <span class="align-self-center col-2 fw-bold">ID</span>
+                                                        <input class="form-control w-100 fw-bold bg-transparent user-id-info" disabled>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <!-- pw 찾기 용 메일 인증 -->
-                                    <form id="mail-check-form" class="d-none">
-                                        <span>회원가입 시 등록한 <span class="text-success">메일</span>로 <span class="text-decoration-underline">인증번호가 발송</span>되었습니다.</span>
-                                        <div class="form-group d-flex mt-3 mb-3">
-                                            <label class="col-2 align-self-center fw-bold">인증번호</label>
-                                            <input type="text" class="form-control find-input col-8" id="mail_check">
-                                            <!-- 유효시간 -->
-                                            <div id="countdown" class="text-danger align-self-center ms-2 col-1"></div>
-                                        </div>
-                                        <div class="text-end mt-4 mb-3">
-                                            <button type="submit" class="btn btn-outline-success btn-block mail-check-btn">인증</button>
-                                        </div>
-                                    </form>
+                                        <!-- pw 찾기 용 메일 인증 -->
+                                        <form id="mail-check-form" class="d-none">
+                                            <span>회원가입 시 등록한 <span class="text-success">메일</span>로 <span class="text-decoration-underline">인증번호가 발송</span>되었습니다.</span>
+                                            <div class="form-group d-flex mt-3 mb-3">
+                                                <label class="col-2 align-self-center fw-bold">인증번호</label>
+                                                <input type="text" class="form-control find-input col-8" id="mail_check">
+                                                <!-- 유효시간 -->
+                                                <div id="countdown" class="text-danger align-self-center ms-2 col-1"></div>
+                                            </div>
+                                            <div class="text-end mt-4 mb-3">
+                                                <button type="submit" class="btn btn-outline-success btn-block mail-check-btn">인증</button>
+                                            </div>
+                                        </form>
 
-                                    <!-- 인증 후 비밀번호 변경 -->
-                                    <form id="change-pw-form" class="d-none">
-                                        <span>새 비밀번호를 등록하세요.</span>
-                                        <div class="form-group d-flex mt-3 mb-3">
-                                            <label class="col-2 align-self-center">새 비밀번호</label>
-                                            <input type="text" class="form-control find-input" id="new_pw">
-                                        </div>
-                                        <div class="form-group d-flex mb-3">
-                                            <label class="col-2 align-self-center">비밀번호 확인</label>
-                                            <input type="text" class="form-control find-input" id="new_pw_check">
-                                        </div>
-                                        <div class="text-end mt-4 mb-3">
-                                            <button type="submit" class="btn btn-outline-success btn-block change-pw-btn">변경</button>
-                                        </div>
-                                    </form>
+                                        <!-- 인증 후 비밀번호 변경 -->
+                                        <form id="change-pw-form" class="d-none">
+                                            <span>새 비밀번호를 등록하세요.</span>
+                                            <div class="form-group d-flex mt-3 mb-3">
+                                                <label class="col-2 align-self-center">새 비밀번호</label>
+                                                <input type="text" class="form-control find-input" id="new_pw">
+                                            </div>
+                                            <div class="form-group d-flex mb-3">
+                                                <label class="col-2 align-self-center">비밀번호 확인</label>
+                                                <input type="text" class="form-control find-input" id="new_pw_check">
+                                            </div>
+                                            <div class="text-end mt-4 mb-3">
+                                                <button type="submit" class="btn btn-outline-success btn-block change-pw-btn">변경</button>
+                                            </div>
+                                        </form>
 
-                                    <div class="new-account mt-5 d-flex align-items-center justify-content-between flex-wrap">
-                                        <small class="mb-0">회원이신가요? <a class="text-primary" th:href="@{/login/generic}">로그인</a></small>
-                                        <small class="mb-0">회원이 아니신가요? <a class="text-primary" th:href="@{/user/register}">회원가입</a></small>
-                                        <small class="mb-0" th:if="${target != 'id'}"><a class="text-primary" th:href="@{/login/find/id}">아이디 찾기</a></small>
-                                        <small class="mb-0" th:if="${target == 'id'}"><a class="text-primary" th:href="@{/login/find/pw}">비밀번호 찾기</a></small>
+                                        <div class="new-account mt-5 d-flex align-items-center justify-content-between flex-wrap">
+                                            <small class="mb-0">회원이신가요? <a class="text-primary" th:href="@{/login/generic}">로그인</a></small>
+                                            <small class="mb-0">회원이 아니신가요? <a class="text-primary" th:href="@{/user/register}">회원가입</a></small>
+                                            <small class="mb-0" th:if="${target != 'id'}"><a class="text-primary" th:href="@{/login/find/id}">아이디 찾기</a></small>
+                                            <small class="mb-0" th:if="${target == 'id'}"><a class="text-primary" th:href="@{/login/find/pw}">비밀번호 찾기</a></small>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -101,34 +102,252 @@
             </div>
         </div>
     </div>
-</div>
 
-<div class="modal modal-sm fade align-content-center" style="display: none;" id="noUserModal" tabindex="-1" aria-labelledby="noUserModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-center">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title fs-5 text-danger" id="noUserModalLabel">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-circle" viewBox="0 0 16 16">
-                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                        <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
-                    </svg>
-                    Caution</h3>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-xl-12">
-                        <p>존재하지 않는 회원입니다.</p>
-                        <p>다시 시도해주세요.</p>
-                    </div>
+    <div class="modal" tabindex="-1" id="noUserModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fs-5 text-danger">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-circle" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                            <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+                        </svg>
+                        Caution
+                    </h5>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-danger light ok-btn" data-bs-dismiss="modal">확인</button>
+                <div class="modal-body col-xl-12">
+                    <p>존재하지 않는 회원입니다.</p>
+                    <p>다시 시도해주세요.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger light ok-btn" data-bs-dismiss="modal">확인</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
+<!--    <div class="modal fade align-content-center" style="display: none;" id="noUserModal">-->
+<!--        <div class="modal-dialog modal-dialog-center" role="document">-->
+<!--            <div class="modal-content">-->
+<!--                <div class="modal-header">-->
+<!--                    <h3 class="modal-title fs-5 text-danger" id="noUserModalLabel">-->
+<!--                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-circle" viewBox="0 0 16 16">-->
+<!--                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>-->
+<!--                            <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>-->
+<!--                        </svg>-->
+<!--                        Caution</h3>-->
+<!--                </div>-->
+<!--                <div class="modal-body">-->
+<!--                    <div class="row">-->
+<!--                        <div class="col-xl-12">-->
+<!--                            <p>존재하지 않는 회원입니다.</p>-->
+<!--                            <p>다시 시도해주세요.</p>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="modal-footer">-->
+<!--                    <button type="button" class="btn btn-outline-danger light ok-btn" data-bs-dismiss="modal">확인</button>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+
+    <div class="modal" tabindex="-1" id="errorOccurModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fs-5 text-danger">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-circle" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                            <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+                        </svg>
+                        Caution
+                    </h5>
+                </div>
+                <div class="modal-body col-xl-12">
+                    <p>문제가 발생했습니다.</p>
+                    <p>다시 시도해주세요.</p>
+                    <p>사유 : <span class="text-danger fw-bold error-msg"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger light ok-btn" data-bs-dismiss="modal">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!--    <div class="modal fade align-content-center" style="display: none;" id="errorOccurModal">-->
+<!--        <div class="modal-dialog modal-dialog-center" role="document">-->
+<!--            <div class="modal-content">-->
+<!--                <div class="modal-header">-->
+<!--                    <h3 class="modal-title fs-5 text-danger" id="errorOccurModalLabel">-->
+<!--                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-circle" viewBox="0 0 16 16">-->
+<!--                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>-->
+<!--                            <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>-->
+<!--                        </svg>-->
+<!--                        Caution</h3>-->
+<!--                </div>-->
+<!--                <div class="modal-body">-->
+<!--                    <div class="row">-->
+<!--                        <div class="col-xl-12">-->
+<!--                            <p>문제가 발생했습니다.</p>-->
+<!--                            <p>다시 시도해주세요.</p>-->
+<!--                            <p>사유 : <span class="text-danger fw-bold error-msg"></span></p>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="modal-footer">-->
+<!--                    <button type="button" class="btn btn-outline-danger light ok-btn" data-bs-dismiss="modal">확인</button>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+
+
+<div th:insert="~{fragment/common-script}"></div>
+
+<script>
+    const findInputs = document.querySelectorAll('.find-input');
+    const _findTarget = document.querySelector('.find-target');
+
+    // form 종류
+    const findForm = document.querySelector('#find-form');              // 아이디 또는 비밀번호 찾기
+    const showIdDiv = document.querySelector('#show-id');               // 찾은 아이디 보여주기
+    const mailCheckForm = document.querySelector('#mail-check-form');   // 비밀번호 찾기 용 메일 인증
+    const changePwForm = document.querySelector('#change-pw-form');     // 비밀번호 변경
+
+    const _userName = document.querySelector('#user_name');
+    const _userLogId = document.querySelector('#user_log_id');
+    const _userEmail = document.querySelector('#user_email');
+    const _userTel = document.querySelector('#user_tel');
+
+    const noUserModal = document.querySelector('#noUserModal')    // 찾는 정보 없음 모달
+    const errorOccurModal = document.querySelector('#errorOccurModal')    // 다른 오류 모달
+    // const noUserModal = new bootstrap.Modal('#noUserModal');    // 찾는 정보 없음 모달
+
+    // input 입력 시 테두리 primary
+    inputBorderPrimary(findInputs);
+
+    // post body에 제출할 map 구성
+    function setSubmitMap() {
+        const submitMap = {
+            userEmail : _userEmail.value,
+            userTel : _userTel.value
+        };
+
+        if(_findTarget.value === ID) {
+            submitMap.userName = _userName.value;
+        }else {
+            submitMap.userLogId = _userLogId.value;
+        }
+
+        return submitMap;
+    }
+
+    // 찾기
+    findForm.addEventListener('submit', async (e) => {
+        console.log('찾기!');
+        e.preventDefault();
+
+        try {
+            const response = await fetch(`/login/api/find/${_findTarget.value}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(setSubmitMap())
+            });
+
+            console.log(response);
+            const responseJson = await response.json();
+
+            if(responseJson.code === 404) {
+                noUserModal.style.display = 'block';
+                console.log("No data returned from server.");
+                return;
+
+            } else if(!response.ok){
+                errorOccurModal.style.display = 'block';
+                document.querySelector('.error-msg').textContent = responseJson.message;
+
+                console.log('error : ', responseJson);
+                throw new Error('Network response was not ok');
+            }
+
+            const data = responseJson.userInfo;
+            if (data) {
+                console.log("ID 찾기 성공");
+                showOrChangeInfo(_findTarget.value, data);
+            }
+
+        } catch (error) {
+            console.error('Error : ', error);
+        }
+    })
+
+    // 모달에서 확인 버튼 누를 시(창 닫기)
+    document.querySelector('.ok-btn').addEventListener('click', (e) => {
+        e.target.closest('.modal').style.display = 'none';  // 해당 모달 닫기
+
+        findInputs.forEach((input) => {
+            input.value = "";
+            input.classList.remove("border-primary");
+        });
+    });
+
+    // 정보 일치할 경우 정보 보여주거나 변경 모달
+    function showOrChangeInfo(findTarget, info) {
+        if(findTarget === ID) {
+            addOrRemoveDnone(findForm, showIdDiv);
+            document.querySelector('.user-id-info').value = info;
+            // findForm.classList.add('d-none');
+            // showIdDiv.classList.remove('d-none');
+        } else {
+            addOrRemoveDnone(findForm, mailCheckForm);
+            // 추후 비밀번호 재설정으로 변경
+        }
+    }
+
+    // d-none 추가와 삭제
+    function addOrRemoveDnone(addDiv = null, removeDiv = null) {
+        addDiv.classList.add('d-none');
+        removeDiv.classList.remove('d-none');
+    }
+
+
+    /** 비밀 번호 찾기 용 메일 인증 */
+
+    // 이메일로 인증번호 발송
+    async function sendVerificationCode() {
+        // 인증번호는 로직에서 생성 후 redis에 저장
+    }
+
+    // 인증 카운트다운
+    window.onload = startCountdown;
+    function startCountdown() {
+        const countdownElement = document.getElementById('countdown'); // 타이머 표시할 요소
+        let remainingTime = 5*60;
+
+        const intervalId = setInterval(() => {
+            if (remainingTime <= 0) {
+                clearInterval(intervalId);
+                countdownElement.textContent = "유효시간 만료";
+                countdownElement.style;
+                return;
+            }
+
+            // 남은 시간 계산
+            const minutes = Math.floor(remainingTime / 60);
+            const seconds = remainingTime % 60;
+
+            countdownElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+            remainingTime--;
+        }, 1000);
+    }
+
+</script>
 
 </body>
 </html>
