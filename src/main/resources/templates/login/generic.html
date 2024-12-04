@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <div th:insert="~{fragment/header}"></div>
+</head>
+<body>
+<div class="d-flex" id="wrapper">
+
+    <!-- Page content wrapper-->
+    <div id="page-content-wrapper">
+
+        <!-- Page content-->
+        <div class="container-fluid mt-5">
+            <div class="col-xl-12">
+                <div class="row align-items-center">
+                    <div class="card login-card border-0">
+                        <div class="card-body d-flex justify-content-center">
+                            <div class="col-xl-6">
+                                <div class="auth-form">
+                                    <h3 class="text-start mb-4 font-w600">로그인</h3>
+                                    <form id="login-form">
+                                        <div class="form-group mb-3">
+                                            <label class="mb-1 text-black">ID<span class="required">*</span></label>
+                                            <input type="text" class="form-control login-input" id="user-log-id" autocomplete="off">
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label class="mb-1 text-black">Password<span class="required">*</span></label>
+                                            <input type="password" class="form-control login-input" id="user-log-pw" autocomplete="off">
+                                        </div>
+                                        <div class="form-row mt-4 mb-4 small">
+                                            <div class="form-check d-flex align-items-center justify-content-evenly flex-wrap">
+                                                <div class="mb-1">
+                                                    <input type="checkbox" class="form-check-input" id="remember_me" checked>
+                                                    <label class="custom-control-label ms-1 text-secondary" for="remember_me">자동 로그인</label>
+                                                </div>
+                                                <div class="mb-1">
+                                                    <input type="checkbox" class="form-check-input" id="remember_id">
+                                                    <label class="custom-control-label ms-1 text-secondary" for="remember_id">아이디 저장</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <button type="submit" class="btn btn-success btn-block">로그인</button>
+                                        </div>
+                                    </form>
+                                    <div class="d-none mt-3 text-danger login-fail">
+                                        <p>존재하지 않는 회원입니다.</p>
+                                        <p>아이디 또는 비밀번호를 다시 확인하세요.</p>
+                                    </div>
+                                    <div class="new-account mt-5 d-flex align-items-center justify-content-between flex-wrap">
+                                        <small class="mb-0">회원이 아니신가요? <a class="text-primary" th:href="@{/templates/user/form}">회원가입</a></small>
+                                        <div>
+                                            <small><a onclick="goFindForm('id');">아이디 찾기</a></small>
+                                            &nbsp/&nbsp
+                                            <small><a onclick="goFindForm('pw');">비밀번호 찾기</a></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+</body>
+</html>
+

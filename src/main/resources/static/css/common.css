@@ -1,0 +1,17 @@
+a {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.top-header {
+    height: 3.5rem;
+    border-bottom: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color) !important;
+    --bs-bg-opacity: 1;
+    background-color: rgba(var(--bs-light-rgb), var(--bs-bg-opacity)) !important;
+}
+
+.img-contain {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
