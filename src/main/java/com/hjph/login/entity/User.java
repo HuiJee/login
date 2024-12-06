@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.print.attribute.standard.MediaSize;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -26,7 +27,7 @@ public class User {
     private String userName;
 
     @Column(name = "user_role")
-    private Character userRole;
+    private String userRole;
 
     @Column(name = "user_email")
     private String userEmail;
@@ -36,4 +37,22 @@ public class User {
 
     @Column(name = "user_nickname")
     private String userNickname;
+
+    @Column(name = "user_create_date")
+    private LocalDateTime userCreateDate;
+
+    @Column(name = "user_update_date")
+    private LocalDateTime userUpdateDate;
+
+    @Column(name = "user_status")
+    private String userStatus;
+
+    @PrePersist
+    protected void onCreate() {
+        userStatus = "Y";
+        userCreateDate = LocalDateTime.now();
+        userUpdateDate = LocalDateTime.now();
+    }
+
+
 }

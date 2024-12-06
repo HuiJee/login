@@ -50,4 +50,5 @@ public class LoginController {
         System.out.println("소셜 로그인");
         return "login/social";
     }
+
 }

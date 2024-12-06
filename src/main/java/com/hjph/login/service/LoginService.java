@@ -1,16 +1,21 @@
 package com.hjph.login.service;
 
+import com.hjph.login.entity.EmailCode;
 import com.hjph.login.entity.User;
 import com.hjph.login.exception.CustomException;
 import com.hjph.login.exception.ErrorCode;
+import com.hjph.login.repository.EmailCodeRepository;
 import com.hjph.login.repository.UserRepository;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @RequiredArgsConstructor
