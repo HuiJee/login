@@ -88,8 +88,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 requestURI.contains("/bootstrap/") ||
                 requestURI.contains("/fonts/") ||
                 requestURI.contains("/images/") ||
-                requestURI.contains("/icons/") ||
-                requestURI.contains("/favicon.ico");
+                requestURI.contains("/icons/");
     }
 
 //    public static String resolveUsersLogId(HttpServletRequest request) {

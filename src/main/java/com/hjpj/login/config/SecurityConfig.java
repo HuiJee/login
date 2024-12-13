@@ -45,7 +45,7 @@ public class SecurityConfig {
                 // 접근 권한 설정
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/static/**", "/public/**", "/resources/static/**", "/META-INF/resources/**",
-                                "/css/**", "/js/**", "/bootstrap/**", "/images/**", "/icons/**", "/fonts/**", "/favicon.ico").permitAll()
+                                "/css/**", "/js/**", "/bootstrap/**", "/images/**", "/icons/**", "/fonts/**").permitAll()
                         .requestMatchers("/login/**", "/").permitAll()
                         .anyRequest().authenticated()
                 )
