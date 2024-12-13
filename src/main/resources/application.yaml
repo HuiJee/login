@@ -33,6 +33,9 @@ spring:
     redis:
       host: localhost
       port: 6379
+      password: testnz1379
+
+#      username: token-redis
 #      password: token1234
 #      password: AUTH redis1234
 

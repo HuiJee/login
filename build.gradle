@@ -42,7 +42,7 @@ dependencies {
 
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-    implementation 'org.springframework.session:spring-session-data-redis'
+//    implementation 'org.springframework.session:spring-session-data-redis'
 
     // 메일 전송
     implementation 'org.springframework.boot:spring-boot-starter-mail:3.2.0'

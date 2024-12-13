@@ -69,29 +69,33 @@
 <div th:insert="~{fragment/common-script}"></div>
 
 <script>
+
     function init() {
+
+        /** 아이디 기억하기의 경우 마지막 로그인한 ID 보여주기 */
         if(SAVED_USER_LOG_ID !== null) {
             rememberId.checked = true;
-            logIdInput.classList.add('border-primary');
-            logIdInput.value = SAVED_USER_LOG_ID;
+            _userLogId.classList.add('border-primary');
+            _userLogId.value = SAVED_USER_LOG_ID;
         }
     }
 
     const loginInputs = document.querySelectorAll('.login-input');  // 아이디, 비밀번호 input
-    const logIdInput = document.querySelector('#user-log-id');        // 아이디 input
-    const logPwInput = document.querySelector('#user-log-pw');        // 아이디 input
+    const _userLogId = document.querySelector('#user-log-id');        // 아이디 input
+    const _userLogPw = document.querySelector('#user-log-pw');        // 아이디 input
     const loginForm = document.querySelector('#login-form');        // 로그인 폼
     const rememberMe = document.querySelector('#remember_me');      // 자동로그인
     const rememberId = document.querySelector('#remember_id');      // 아이디 기억하기
 
-    // 로그인 정보 작성하면 파란 테두리 적용
+    /** 로그인 정보 입력 시 input에 파란 테두리 적용 */
     inputBorderPrimary(loginInputs);
 
-    // 아이디 또는 비밀번호 찾는 페이지로 이동
+    /** 아이디 또는 비밀번호 찾기 페이지로 이동 */
     function goFindForm(findTarget) {
         window.location.href = `/login/find/${findTarget}`;
     }
 
+    /** 로그인 진행 (로그인 버튼 클릭)*/
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault(); // 기본 제출 동작 방지
 
@@ -99,13 +103,13 @@
             const response = await fetch('/login/api/auth-user', {
                 method: 'POST',
                 headers: {
-                    'Authorization' : `Basic ` + btoa(logIdInput.value),
+                    'Authorization' : `Basic ` + btoa(_userLogId.value),
                     // btoa를 통해 userLogId를 Base64로 인코딩하여 보낸다.
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 },
                 body: JSON.stringify({
-                    userLogPw: logPwInput.value,
+                    userLogPw: _userLogPw.value,
                     rememberMe: rememberMe.checked
                 })
             });
@@ -135,12 +139,13 @@
 
             console.log('Success:', data);
 
-            location.href = '/login/loginResult';
+            location.href = '/login/result';
         } catch (error) {
             console.error('Error:', error);
         }
     });
 
+    /** 아이디 기억하기 */
     function setRememberId(check, logId) {
         if(check) {
             localStorage.setItem('savedUserLogId', logId);
