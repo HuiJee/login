@@ -8,10 +8,9 @@ import com.hjpj.login.exception.CustomException;
 import com.hjpj.login.exception.ErrorCode;
 import com.hjpj.login.jwt.JwtUtil;
 import com.hjpj.login.repository.UserRepository;
+import io.lettuce.core.ScriptOutputType;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,8 +22,6 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.util.Optional.of;
-
 @Service
 @RequiredArgsConstructor
 public class LoginService {
@@ -33,7 +30,6 @@ public class LoginService {
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
 
-    // ResponseEntity로 넘기느냐 아니냐...
     public Map<String, Object> authUserLogin(String authHeader, LoginInfoDTO logInfo, HttpServletResponse response) {
 
         // 헤더 정보가 없는 경우
@@ -53,6 +49,7 @@ public class LoginService {
 
         // 해당 사용자를 AUTH에 담을 UserLogDetail 형태로 만들기
         UserLogDetail userLogDetail = new UserLogDetail(user);
+        userLogDetail.setAutoLogin(logInfo.getAutoLogin());
 
         // 인증 정보 만들기
         Authentication auth = new UsernamePasswordAuthenticationToken(userLogDetail, credentials, userLogDetail.getAuthorities());
@@ -61,17 +58,19 @@ public class LoginService {
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         // 토큰 및 쿠키 생성 후 access만 전달받기
-        String accessToken = tokenService.makeTokenAndCookie(auth, userLogDetail,response);
+        tokenService.makeTokenAndCookie(auth, userLogDetail,response);
+
+        System.out.println(passwordEncoder.matches(logInfo.getUserLogPw(), userLogDetail.getUserLogPw()));
 
         if (passwordEncoder.matches(logInfo.getUserLogPw(), userLogDetail.getUserLogPw())) {
             Map<String, Object> result = new HashMap<>();
             result.put("user", userLogDetail);
-//            result.put("accessToken", accessToken);
 
             System.out.println("성공적으로 로그인 로직 실행!");
 
             return result;
         } else {
+            System.out.println("비밀번호 일치하지 않음");
             throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
     }

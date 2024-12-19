@@ -26,4 +26,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "FROM User u WHERE u.userLogId = :userLogId")
     Optional<UserDTO> findUserByUserInfo(@Param("userLogId") String userLogId);
 
+    @Query("SELECT new com.hjpj.login.dto.UserDTO(u.userId, u.userLogId, null, u.userNickname, u.userRole) " +
+            "FROM User u WHERE u.userId = :userId")
+    Optional<UserDTO> findUserByUserId(@Param("userId") Long userId);
+
 }

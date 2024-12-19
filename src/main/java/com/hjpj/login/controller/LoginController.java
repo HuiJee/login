@@ -21,17 +21,16 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class LoginController {
 
-    private static final Logger log = LoggerFactory.getLogger(LoginController.class);
     private final LoginService loginService;
 
-    // 일반 로그인 페이지
+    /** 일반 로그인 페이지 이동 */
     @GetMapping("/generic")
     public String loginGeneric() {
         System.out.println("일반 로그인");
         return "login/generic";
     }
 
-    // 아이디 또는 pw 찾기 페이지
+    /** 아이디 또는 pw 찾기 페이지 이동 */
     @GetMapping("/find/{findTarget}")
     public String loginFindForm(@PathVariable String findTarget, Model model) {
         System.out.println("아이디/비번 찾기 : " + findTarget);
@@ -39,7 +38,7 @@ public class LoginController {
         return "login/findForm";
     }
 
-    // 아이디 또는 pw 찾기
+    /** 아이디 또는 pw 찾기 */
     @PostMapping("/api/find/{findTarget}")
     public ResponseEntity<?> findIdOrPw(@PathVariable String findTarget,
                                         @RequestBody User user) {
@@ -49,7 +48,7 @@ public class LoginController {
         return ResponseEntity.ok(result);
     }
 
-    // 로그인
+    /** 로그인 진행 */
     @PostMapping("/api/auth-user")
     public ResponseEntity<?> authUserLogin(@RequestHeader("Authorization") String authHeader,
                                       @RequestBody LoginInfoDTO logInfo,
@@ -58,17 +57,11 @@ public class LoginController {
         return ResponseEntity.ok(loginService.authUserLogin(authHeader, logInfo, response));
     }
 
-    // 소셜 로그인 페이지
+    /** 소셜 로그인 페이지 */
     @GetMapping("/social")
     public String loginSocial() {
         System.out.println("소셜 로그인");
         return "login/social";
-    }
-
-    // 로그인 결과 창
-    @GetMapping("/result")
-    public String loginResult() {
-        return "login/loginResult";
     }
 
 }

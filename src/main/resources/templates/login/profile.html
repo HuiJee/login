@@ -69,6 +69,7 @@
                     <br><span class="fw-bold text-decoration-underline">아이디 기억하기</span>를 선택한 경우 해당 기능만 활성화됩니다.)</p>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger light close-btn" data-bs-dismiss="modal">취소</button>
                 <button type="button" class="btn btn-outline-danger light ok-logout-btn" data-bs-dismiss="modal">확인</button>
             </div>
         </div>
@@ -79,14 +80,48 @@
 
 <script>
 
-    const confLogoutModal = document.querySelector('#confLogoutModal');
+    function init() {
+        console.log(USER_ID);
+        console.log(USER_LOG_ID);
 
-    // 로그아웃 버튼
+        console.log(localStorage.getItem('userId'));
+        console.log(localStorage.getItem('userLogId'));
+
+        getUserInfo();
+    }
+
+    const _userLogId = document.querySelector('#user-log-id');          // 아이디 보여주는 input
+    const _userNickname = document.querySelector('#user-nickname');     // 닉네임 보여주는 input
+    const _userRole = document.querySelector('#user-role');             // 권한 보여주는 input
+
+    const confLogoutModal = document.querySelector('#confLogoutModal'); // 로그아웃 확인 모달
+
+    /** 회원 정보 찾아와 보여주기 */
+    function getUserInfo() {
+        tokenCheckFetch(`/user/`+USER_ID,{
+            headers: {
+                'UserLogId' : USER_LOG_ID
+            }
+        })
+        .then(response => response.json())
+        .then(user => {
+            setUserInfo(user);
+        });
+    }
+
+    /** 가져온 회원 정보 보여주기 */
+    function setUserInfo(user) {
+        _userLogId.value = user.userLogId;
+        _userNickname.value = user.userNickname;
+        _userRole.value = user.userRole;
+    }
+
+    /** 로그아웃 버튼 클릭 */
     document.querySelector('.logout-btn').addEventListener('click', () => {
         confLogoutModal.style.display = 'block';
     });
 
-    // 로그아웃 확인 버튼
+    /** 로그아웃 conf모달 확인 버튼 클릭 */
     document.querySelector('.ok-logout-btn').addEventListener('click', () => {
         // 모달 닫기
         confLogoutModal.style.display = 'block';
@@ -97,6 +132,7 @@
         window.location.href = "/login/generic";
     });
 
+    window.onload = init;
 
 </script>
 

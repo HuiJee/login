@@ -2,6 +2,7 @@ package com.hjpj.login.config;
 
 import com.hjpj.login.jwt.JwtAuthenticationFilter;
 import com.hjpj.login.jwt.JwtProvider;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,11 +46,16 @@ public class SecurityConfig {
                 // 접근 권한 설정
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/static/**", "/public/**", "/resources/static/**", "/META-INF/resources/**",
-                                "/css/**", "/js/**", "/bootstrap/**", "/images/**", "/icons/**", "/fonts/**").permitAll()
-                        .requestMatchers("/login/**", "/").permitAll()
+                                "/css/**", "/js/**", "/bootstrap/**", "/images/**", "/icons/**", "/favicon.ico", "/fonts/**").permitAll()
+                        .requestMatchers("/login/**", "/user/**", "/").permitAll()
                         .anyRequest().authenticated()
                 )
-
+                // 명시적인 설정이 없을 경우, filterChain 통과를 못하면 403이 반환될 수 있기에 설정!
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                        })
+                )
                 // 사용자 정의 JWT 필터 추가 (인증 후 실행)
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
                 .build();

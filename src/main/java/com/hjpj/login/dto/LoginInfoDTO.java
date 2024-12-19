@@ -6,5 +6,6 @@ import lombok.Getter;
 public class LoginInfoDTO {
 
     private String userLogPw;
-    private boolean rememberMe;
+    private Boolean rememberId;
+    private Boolean autoLogin;
 }

@@ -2,6 +2,7 @@ const USER_ID = localStorage.getItem('userId'); // User 테이블 pk
 const USER_LOG_ID = localStorage.getItem('userLogId');  // User의 login id
 
 const SAVED_USER_LOG_ID = localStorage.getItem('savedUserLogId');   // 아이디 기억하기 여부
+const SAVED_AUTO_LOGIN = localStorage.getItem('autoLogin');
 
 const ONE = 1;
 const TWO = 2;
@@ -49,7 +50,10 @@ function goLoginAgain() {
 /** 기능 실행 시 쿠키 확인하고 진행 (access 만료 시 refresh로 재발급)*/
 async function tokenCheckFetch(url, options = {}) {
 
-    if(USER_ID === null) {
+    console.log('userId : ', USER_ID);
+    console.log('userLogId : ', USER_LOG_ID);
+
+    if(USER_ID === null || USER_LOG_ID === null) {
         window.location.href="/login/generic";
         return;
     }
@@ -64,13 +68,19 @@ async function tokenCheckFetch(url, options = {}) {
     console.log("Initial response status:", response.status);
 
     if (response.status === 401) {
-        console.log("Token expired, attempting to refresh...");
+        console.log("AccessToken expired, attempting to refresh...");
 
         const refreshTokenResponse = await fetch('/user/refresh-token', {
-            ...options.headers,
+            headers: {
+                'UserLogId': USER_LOG_ID,
+            },
             method: 'POST',
         });
+
+        console.log(refreshTokenResponse.status);
+
         if (refreshTokenResponse.ok) {
+            console.log('refreshToken 존재!');
             // 리프레시 토큰으로 access 생성 후 다시 기능 시도
             response = await fetch(url, {
                 ...options,
@@ -88,4 +98,9 @@ async function tokenCheckFetch(url, options = {}) {
     }
     return response;
 }
+
+document.querySelector('.close-btn').addEventListener('click', (e) => {
+    const parentModal = e.target.closest('.modal');
+    parentModal.style.display = 'none';
+});
 
