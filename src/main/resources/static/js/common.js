@@ -2,6 +2,7 @@ const USER_ID = localStorage.getItem('userId'); // User 테이블 pk
 const USER_LOG_ID = localStorage.getItem('userLogId');  // User의 login id
 
 const SAVED_USER_LOG_ID = localStorage.getItem('savedUserLogId');   // 아이디 기억하기 여부
+const SAVED_AUTO_LOGIN = localStorage.getItem('savedAutoLogin');
 
 const ONE = 1;
 const TWO = 2;
@@ -11,22 +12,6 @@ const FALSE = "false";
 
 const ID = "id";
 const PW = "pw";
-
-
-/** 로그인 여부에 따른 사이드 바 메뉴 수정*/
-const loginBeforeMenu = document.querySelectorAll('.login-before');
-const loginAfterMenu = document.querySelectorAll('.login-after');
-
-loginBeforeMenu.forEach((menu) => {
-    USER_ID !== null ?
-    menu.classList.add('d-none') : menu.classList.remove('d-none');
-});
-
-loginAfterMenu.forEach((menu) => {
-    USER_ID !== null ?
-    menu.classList.remove('d-none') : menu.classList.add('d-none');
-});
-
 
 /** 스토리지 삭제 (로그아웃 시, 리프레시 토큰 만료 시)*/
 function localStorageDel() {
@@ -49,13 +34,10 @@ function goLoginAgain() {
 /** 기능 실행 시 쿠키 확인하고 진행 (access 만료 시 refresh로 재발급)*/
 async function tokenCheckFetch(url, options = {}) {
 
-    if(USER_ID === null) {
+    if(USER_ID === null || USER_LOG_ID === null) {
         window.location.href="/login/generic";
         return;
     }
-
-    console.log('url : ', url);
-    console.log('options : ', options);
 
     let response = await fetch(url, {
         ...options,
@@ -64,13 +46,19 @@ async function tokenCheckFetch(url, options = {}) {
     console.log("Initial response status:", response.status);
 
     if (response.status === 401) {
-        console.log("Token expired, attempting to refresh...");
+        console.log("AccessToken expired, attempting to refresh...");
 
         const refreshTokenResponse = await fetch('/user/refresh-token', {
-            ...options.headers,
+            headers: {
+                'UserLogId': USER_LOG_ID,
+            },
             method: 'POST',
         });
+
+        console.log(refreshTokenResponse.status);
+
         if (refreshTokenResponse.ok) {
+            console.log('refreshToken 존재!');
             // 리프레시 토큰으로 access 생성 후 다시 기능 시도
             response = await fetch(url, {
                 ...options,

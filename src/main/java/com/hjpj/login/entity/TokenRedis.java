@@ -8,26 +8,17 @@ import org.springframework.data.redis.core.RedisHash;
 
 @Getter
 @AllArgsConstructor
-@RedisHash(value = "token", timeToLive = JwtUtil.REFRESH_TOKEN_VALIDITY)
+@RedisHash(value = "token", timeToLive = JwtUtil.REFRESH_TOKEN_VALIDITY/1000)
 public class TokenRedis {
     
     @Id
     private String userLogId;
-    
-//    @Indexed    // 보조 인덱스 설정 어노테이션
-//    private String accessToken;
-    
     private String refreshToken;
 
     @Override
     public String toString() {
         return "TokenRedis [userLogId=" + userLogId + ", refreshToken=" + refreshToken + "]";
     }
-
-    //    @Override
-//    public String toString() {
-//        return "TokenRedis [userLogId=" + userLogId + ", accessToken=" + accessToken + ", refreshToken=" + refreshToken + "]";
-//    }
 
         /*
         Refresh Token은 Redis에 저장하기 때문에 JPA 의존성이 필요하지 않다.

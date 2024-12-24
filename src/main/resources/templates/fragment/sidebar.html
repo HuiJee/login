@@ -1,0 +1,7 @@
+<div th:fragment="sidebar" class="border-end bg-white" id="sidebar-wrapper">
+	<div class="list-group list-group-flush">
+		<a class="list-group-item-action list-group-item-light p-3" th:href="@{/login/generic}">* Login</a>
+		<a class="list-group-item-action list-group-item-light p-3" th:href="@{/login/social}">* Social Login</a>
+		<a class="list-group-item-action list-group-item-light p-3" th:href="@{/user/profile}">* Profile<small>(update & logout)</small></a>
+	</div>
+</div>

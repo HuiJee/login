@@ -7,6 +7,9 @@
 <body>
     <div class="d-flex" id="wrapper">
 
+        <!-- Sidebar-->
+        <div th:insert="~{fragment/sidebar}"></div>
+
         <!-- Page content wrapper-->
         <div id="page-content-wrapper">
 
@@ -218,7 +221,7 @@
         return submitMap;
     }
 
-    // 찾기
+    /** ID 또는 PW 찾기*/
     findForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -260,7 +263,7 @@
         }
     })
 
-    // 모달에서 확인 버튼 누를 시(창 닫기)
+    /** 모달에서 확인 버튼 누르기 (창 닫기) */
     document.querySelectorAll('.ok-btn').forEach((btn) => {
         btn.addEventListener('click', (e) => {
             const parentModal = e.target.closest('.modal');
@@ -279,7 +282,7 @@
         });
     });
 
-    // 정보 일치할 경우 정보 보여주거나 변경 모달
+    /** 정보 일치할 경우 ID 노출 또는 변경 요청 모달 */
     function showOrChangeInfo(findTarget, info) {
         if(findTarget === ID) {
             console.log("ID 찾기 성공");
@@ -294,7 +297,7 @@
         }
     }
 
-    // d-none 추가와 삭제
+    /** d-none 추가와 삭제 */
     function addOrRemoveDisplayNone(addDiv = null, removeDiv = null) {
         addDiv.classList.add('d-none');
         removeDiv.classList.remove('d-none');
@@ -302,7 +305,6 @@
 
 
     /** 비밀 번호 찾기 용 메일 인증 */
-    // 이메일로 인증번호 발송
     async function sendVerificationCodeToEmail(email) {
         console.log("메일 전송");
         // 인증번호는 로직에서 생성 후 redis에 저장
@@ -339,7 +341,7 @@
         }
     }
 
-    // 인증 카운트다운
+    /** 인증 카운트다운 */
     function startCountdown() {
         const countdownElement = document.getElementById('countdown'); // 타이머 표시할 요소
         let remainingTime = 60;

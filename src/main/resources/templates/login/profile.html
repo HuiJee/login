@@ -7,6 +7,9 @@
 <body>
 <div class="d-flex" id="wrapper">
 
+    <!-- Sidebar-->
+    <div th:insert="~{fragment/sidebar}"></div>
+
     <!-- Page content wrapper-->
     <div id="page-content-wrapper">
 
@@ -21,15 +24,15 @@
                                     <h3 class="text-start mb-4 font-w600">Test NZ 방문을 환영합니다.</h3>
                                     <div>
                                         <div class="form-group mb-3">
-                                            <label class="mb-1 text-black">ID(아이디)</label>
+                                            <label class="mb-1 text-black fw-bold">ID <span>아이디</span></label>
                                             <input type="text" class="form-control" id="user-log-id" disabled>
                                         </div>
                                         <div class="form-group mb-3">
-                                            <label class="mb-1 text-black">Nickname(닉네임)</label>
+                                            <label class="mb-1 text-black fw-bold">Nickname <span>닉네임</span></label>
                                             <input type="text" class="form-control" id="user-nickname" disabled>
                                         </div>
                                         <div class="form-group mb-3">
-                                            <label class="mb-1 text-black">Role(권한)
+                                            <label class="mb-1 text-black fw-bold">Role <span>권한</span>
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-question-circle" viewBox="0 0 16 16">
                                                     <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
                                                     <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286m1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94"/>
@@ -69,6 +72,7 @@
                     <br><span class="fw-bold text-decoration-underline">아이디 기억하기</span>를 선택한 경우 해당 기능만 활성화됩니다.)</p>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger light close-btn" data-bs-dismiss="modal">취소</button>
                 <button type="button" class="btn btn-outline-danger light ok-logout-btn" data-bs-dismiss="modal">확인</button>
             </div>
         </div>
@@ -79,14 +83,42 @@
 
 <script>
 
-    const confLogoutModal = document.querySelector('#confLogoutModal');
+    function init() {
+        getUserInfo();
+    }
 
-    // 로그아웃 버튼
+    const _userLogId = document.querySelector('#user-log-id');          // 아이디 보여주는 input
+    const _userNickname = document.querySelector('#user-nickname');     // 닉네임 보여주는 input
+    const _userRole = document.querySelector('#user-role');             // 권한 보여주는 input
+
+    const confLogoutModal = document.querySelector('#confLogoutModal'); // 로그아웃 확인 모달
+
+    /** 회원 정보 찾아와 보여주기 */
+    function getUserInfo() {
+        tokenCheckFetch(`/user/`+USER_ID,{
+            headers: {
+                'UserLogId' : USER_LOG_ID
+            }
+        })
+        .then(response => response.json())
+        .then(user => {
+            setUserInfo(user);
+        });
+    }
+
+    /** 가져온 회원 정보 보여주기 */
+    function setUserInfo(user) {
+        _userLogId.value = user.userLogId;
+        _userNickname.value = user.userNickname;
+        _userRole.value = user.userRole;
+    }
+
+    /** 로그아웃 버튼 클릭 */
     document.querySelector('.logout-btn').addEventListener('click', () => {
         confLogoutModal.style.display = 'block';
     });
 
-    // 로그아웃 확인 버튼
+    /** 로그아웃 conf모달 확인 버튼 클릭 */
     document.querySelector('.ok-logout-btn').addEventListener('click', () => {
         // 모달 닫기
         confLogoutModal.style.display = 'block';
@@ -97,6 +129,13 @@
         window.location.href = "/login/generic";
     });
 
+    /** 닫힘 버튼 누를 경우 */
+    document.querySelector('.close-btn').addEventListener('click', (e) => {
+        const parentModal = e.target.closest('.modal');
+        parentModal.style.display = 'none';
+    });
+
+    window.onload = init;
 
 </script>
 

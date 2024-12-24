@@ -8,10 +8,11 @@ import com.hjpj.login.exception.CustomException;
 import com.hjpj.login.exception.ErrorCode;
 import com.hjpj.login.jwt.JwtUtil;
 import com.hjpj.login.repository.UserRepository;
+import com.hjpj.login.util.CommonUtil;
+import io.lettuce.core.ScriptOutputType;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,8 +24,6 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.util.Optional.of;
-
 @Service
 @RequiredArgsConstructor
 public class LoginService {
@@ -33,26 +32,18 @@ public class LoginService {
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
 
-    // ResponseEntity로 넘기느냐 아니냐...
-    public Map<String, Object> authUserLogin(String authHeader, LoginInfoDTO logInfo, HttpServletResponse response) {
+    public Map<String, Object> authUserLogin(HttpServletRequest request, LoginInfoDTO logInfo, HttpServletResponse response) {
 
-        // 헤더 정보가 없는 경우
-        if(authHeader == null || !authHeader.startsWith(JwtUtil.INITIAL_TYPE)) {
-            throw new CustomException(ErrorCode.MISSING_TOKEN);
-        }
-
-        // 앞에 Basic을 제외한 정보 받기(회원 아이디 인코딩한 정보)
-        String base64Credentials = authHeader.substring(JwtUtil.INITIAL_TYPE.length()).trim();
-
-        // 위의 정보 디코딩하여 추출
-        String credentials = new String(Base64.getDecoder().decode(base64Credentials), StandardCharsets.UTF_8);
+        // 헤더 확인 후 userLogId 추출하기
+        String credentials = initialHeaderCheckAndGetLogId(request);
         System.out.println("userLogId : " + credentials);
 
         // 해당 ID를 가진 사용자 찾아서 없는 경우 에러 날리기
-        UserDTO user = userRepository.findUserByUserInfo(credentials).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        UserDTO user = userRepository.findUserByUserLogId(credentials).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         // 해당 사용자를 AUTH에 담을 UserLogDetail 형태로 만들기
         UserLogDetail userLogDetail = new UserLogDetail(user);
+        userLogDetail.setAutoLogin(logInfo.getAutoLogin());
 
         // 인증 정보 만들기
         Authentication auth = new UsernamePasswordAuthenticationToken(userLogDetail, credentials, userLogDetail.getAuthorities());
@@ -61,17 +52,19 @@ public class LoginService {
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         // 토큰 및 쿠키 생성 후 access만 전달받기
-        String accessToken = tokenService.makeTokenAndCookie(auth, userLogDetail,response);
+        tokenService.makeTokenAndCookie(auth, userLogDetail,response);
+
+        System.out.println(passwordEncoder.matches(logInfo.getUserLogPw(), userLogDetail.getUserLogPw()));
 
         if (passwordEncoder.matches(logInfo.getUserLogPw(), userLogDetail.getUserLogPw())) {
             Map<String, Object> result = new HashMap<>();
             result.put("user", userLogDetail);
-//            result.put("accessToken", accessToken);
 
             System.out.println("성공적으로 로그인 로직 실행!");
 
             return result;
         } else {
+            System.out.println("비밀번호 일치하지 않음");
             throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
     }
@@ -100,6 +93,34 @@ public class LoginService {
         result.put("userInfo", userEmail);
 
         return result;
+    }
+
+    public UserDTO findByUserLogId(HttpServletRequest request, HttpServletResponse response) {
+        // 헤더 확인 후 userLogId 추출하기
+        String userLogId = initialHeaderCheckAndGetLogId(request);
+
+        UserDTO user = userRepository.findUserByUserLogId(userLogId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        // 토큰 찾아서 작업하기 (문제 있는 경우 throw 됨)
+        tokenService.getAccessFromRefresh(user.getUserLogId(), response);
+
+        return user;
+    }
+
+    /** 초기 헤더 정보 확인 및 userLogId 추출 */
+    public String initialHeaderCheckAndGetLogId(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+
+        // 헤더 정보가 없는 경우
+        if(authHeader == null || !authHeader.startsWith(JwtUtil.INITIAL_TYPE)) {
+            throw new CustomException(ErrorCode.MISSING_TOKEN);
+        }
+
+        // 앞에 Basic을 제외한 정보 받기(회원 아이디 인코딩한 정보)
+        String base64Credentials = authHeader.substring(JwtUtil.INITIAL_TYPE.length()).trim();
+
+        return new String(Base64.getDecoder().decode(base64Credentials), StandardCharsets.UTF_8);
     }
 
 }

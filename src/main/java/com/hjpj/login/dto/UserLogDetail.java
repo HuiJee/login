@@ -4,6 +4,7 @@ import com.hjpj.login.entity.User;
 import com.hjpj.login.util.UserRole;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,6 +26,8 @@ public class UserLogDetail implements UserDetails {
     private String userRole;
 
     private Boolean rememberMe;
+    @Setter
+    private Boolean autoLogin;
 
     public UserLogDetail(UserDTO user) {
         this.userId = user.getUserId();
