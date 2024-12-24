@@ -8,7 +8,7 @@ import org.springframework.data.redis.core.RedisHash;
 
 @Getter
 @AllArgsConstructor
-@RedisHash(value = "token", timeToLive = JwtUtil.REFRESH_TOKEN_VALIDITY)
+@RedisHash(value = "token", timeToLive = JwtUtil.REFRESH_TOKEN_VALIDITY/1000)
 public class TokenRedis {
     
     @Id

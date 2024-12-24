@@ -2,7 +2,7 @@ const USER_ID = localStorage.getItem('userId'); // User 테이블 pk
 const USER_LOG_ID = localStorage.getItem('userLogId');  // User의 login id
 
 const SAVED_USER_LOG_ID = localStorage.getItem('savedUserLogId');   // 아이디 기억하기 여부
-const SAVED_AUTO_LOGIN = localStorage.getItem('autoLogin');
+const SAVED_AUTO_LOGIN = localStorage.getItem('savedAutoLogin');
 
 const ONE = 1;
 const TWO = 2;
@@ -50,16 +50,10 @@ function goLoginAgain() {
 /** 기능 실행 시 쿠키 확인하고 진행 (access 만료 시 refresh로 재발급)*/
 async function tokenCheckFetch(url, options = {}) {
 
-    console.log('userId : ', USER_ID);
-    console.log('userLogId : ', USER_LOG_ID);
-
     if(USER_ID === null || USER_LOG_ID === null) {
         window.location.href="/login/generic";
         return;
     }
-
-    console.log('url : ', url);
-    console.log('options : ', options);
 
     let response = await fetch(url, {
         ...options,
@@ -99,8 +93,8 @@ async function tokenCheckFetch(url, options = {}) {
     return response;
 }
 
-document.querySelector('.close-btn').addEventListener('click', (e) => {
-    const parentModal = e.target.closest('.modal');
-    parentModal.style.display = 'none';
-});
+// document.querySelector('.close-btn').addEventListener('click', (e) => {
+//     const parentModal = e.target.closest('.modal');
+//     parentModal.style.display = 'none';
+// });
 

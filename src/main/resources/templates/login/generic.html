@@ -71,6 +71,8 @@
 <script>
 
     function init() {
+        // 자동 로그인 확인하기
+        isAutoLoginBefore();
 
         /** 아이디 기억하기의 경우 마지막 로그인한 ID 보여주기 */
         if(SAVED_USER_LOG_ID !== null) {
@@ -86,6 +88,39 @@
     const loginForm = document.querySelector('#login-form');        // 로그인 폼
     const autoLogin = document.querySelector('#auto_login');      // 자동로그인
     const rememberId = document.querySelector('#remember_id');      // 아이디 기억하기
+
+    /** 자동 로그인 여부에 따라 처리 */
+    async function isAutoLoginBefore() {
+        // 자동로그인 정보가 남아있으면, 해당 ID 객체 찾아와서 셋팅 후 프로필로 이동
+        if(SAVED_AUTO_LOGIN !== null) {
+            console.log('로그인 정보 남아있음 : ', SAVED_AUTO_LOGIN);
+            try {
+                const response = await fetch('/login/auto-login', {
+                    headers: {
+                        'Authorization' : `Basic ` + btoa(SAVED_AUTO_LOGIN),
+                        // btoa를 통해 userLogId를 Base64로 인코딩하여 보낸다.
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                console.log('response : ', response);
+
+                if(response.ok) {
+                    const user = await response.json();
+                    localStorage.setItem('userId', user.userId);
+                    localStorage.setItem('userLogId', user.userLogId);
+
+                    setRememberId(rememberId.checked, user.userLogId);
+                    setAutoLogin(autoLogin.checked, user.userLogId);
+
+                    location.href = '/user/profile';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+    }
 
     /** 로그인 정보 입력 시 input에 파란 테두리 적용 */
     inputBorderPrimary(loginInputs);
@@ -137,6 +172,7 @@
             localStorage.setItem('userLogId', data.user.userLogId);
 
             setRememberId(rememberId.checked, data.user.userLogId);
+            setAutoLogin(autoLogin.checked, data.user.userLogId);
 
             console.log('Success:', data);
 
@@ -152,6 +188,15 @@
             localStorage.setItem('savedUserLogId', logId);
         } else {
             localStorage.removeItem('savedUserLogId');
+        }
+    }
+
+    /** 자동 로그인 */
+    function setAutoLogin(check, logId) {
+        if(check) {
+            localStorage.setItem('savedAutoLogin', logId);
+        } else {
+            localStorage.removeItem('savedAutoLogin');
         }
     }
 

@@ -21,8 +21,6 @@ public class JwtGenerator {
 
     private final Key key;
 
-    long now = (new Date()).getTime();
-
     /** application.yaml 에서 secret 값 가져와 key에 저장 */
     public JwtGenerator(@Value("${jwt.secret}") String secretKey) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
@@ -57,7 +55,7 @@ public class JwtGenerator {
                 .setSubject(userLogDetail.getUserLogId())
                 .claim(CommonUtil.AUTH_NAME, authorities)
                 .claim(CommonUtil.USER_LOG_ID_NAME, userLogDetail.getUserLogId())
-                .setExpiration(new Date(now + validTime))
+                .setExpiration(new Date(System.currentTimeMillis() + validTime))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }

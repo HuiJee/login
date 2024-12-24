@@ -8,7 +8,9 @@ import com.hjpj.login.exception.CustomException;
 import com.hjpj.login.exception.ErrorCode;
 import com.hjpj.login.jwt.JwtUtil;
 import com.hjpj.login.repository.UserRepository;
+import com.hjpj.login.util.CommonUtil;
 import io.lettuce.core.ScriptOutputType;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,22 +32,14 @@ public class LoginService {
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
 
-    public Map<String, Object> authUserLogin(String authHeader, LoginInfoDTO logInfo, HttpServletResponse response) {
+    public Map<String, Object> authUserLogin(HttpServletRequest request, LoginInfoDTO logInfo, HttpServletResponse response) {
 
-        // 헤더 정보가 없는 경우
-        if(authHeader == null || !authHeader.startsWith(JwtUtil.INITIAL_TYPE)) {
-            throw new CustomException(ErrorCode.MISSING_TOKEN);
-        }
-
-        // 앞에 Basic을 제외한 정보 받기(회원 아이디 인코딩한 정보)
-        String base64Credentials = authHeader.substring(JwtUtil.INITIAL_TYPE.length()).trim();
-
-        // 위의 정보 디코딩하여 추출
-        String credentials = new String(Base64.getDecoder().decode(base64Credentials), StandardCharsets.UTF_8);
+        // 헤더 확인 후 userLogId 추출하기
+        String credentials = initialHeaderCheckAndGetLogId(request);
         System.out.println("userLogId : " + credentials);
 
         // 해당 ID를 가진 사용자 찾아서 없는 경우 에러 날리기
-        UserDTO user = userRepository.findUserByUserInfo(credentials).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        UserDTO user = userRepository.findUserByUserLogId(credentials).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         // 해당 사용자를 AUTH에 담을 UserLogDetail 형태로 만들기
         UserLogDetail userLogDetail = new UserLogDetail(user);
@@ -99,6 +93,34 @@ public class LoginService {
         result.put("userInfo", userEmail);
 
         return result;
+    }
+
+    public UserDTO findByUserLogId(HttpServletRequest request, HttpServletResponse response) {
+        // 헤더 확인 후 userLogId 추출하기
+        String userLogId = initialHeaderCheckAndGetLogId(request);
+
+        UserDTO user = userRepository.findUserByUserLogId(userLogId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        // 토큰 찾아서 작업하기 (문제 있는 경우 throw 됨)
+        tokenService.getAccessFromRefresh(user.getUserLogId(), response);
+
+        return user;
+    }
+
+    /** 초기 헤더 정보 확인 및 userLogId 추출 */
+    public String initialHeaderCheckAndGetLogId(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+
+        // 헤더 정보가 없는 경우
+        if(authHeader == null || !authHeader.startsWith(JwtUtil.INITIAL_TYPE)) {
+            throw new CustomException(ErrorCode.MISSING_TOKEN);
+        }
+
+        // 앞에 Basic을 제외한 정보 받기(회원 아이디 인코딩한 정보)
+        String base64Credentials = authHeader.substring(JwtUtil.INITIAL_TYPE.length()).trim();
+
+        return new String(Base64.getDecoder().decode(base64Credentials), StandardCharsets.UTF_8);
     }
 
 }
