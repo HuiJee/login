@@ -6,6 +6,10 @@
 
 <span style="font-size:12px;">해당 칸이 채워진 경우에만 파란 테두리(클래스명)를 두고, 전부 적용된 경우에만 로그인 진행.</span>
 
+![image](https://github.com/user-attachments/assets/eb6caa16-1390-4cfb-97a3-5056f9c570c3)
+
+<span style="font-size:12px;">전부 작성이 이루어지지 않은 경우 '다시 시도하세요.' 문구가 3초간 보여짐.</span>
+
 <br>
 
 ### \# 로그인 실패
