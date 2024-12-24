@@ -33,9 +33,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "FROM User u WHERE u.userId = :userId and u.userStatus = true")
     Optional<UserDTO> findUserByUserId(@Param("userId") Long userId);
 
-    // 로그아웃 용 상태 변경
+    // 탈퇴 용 상태 변경
     @Modifying
-    @Query("UPDATE User u SET u.userStatus = false WHERE u.userLogId = :userLogId")
+    @Query("UPDATE User u SET u.userStatus = false, u.userUpdateDate = CURRENT_TIMESTAMP WHERE u.userLogId = :userLogId")
     int updateUserStatus(@Param("userLogId") String userLogId);
 
     // 아이디 중복 검사

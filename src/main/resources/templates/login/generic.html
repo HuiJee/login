@@ -29,7 +29,7 @@
                                         </div>
                                         <div class="form-group mb-3">
                                             <label class="mb-1 text-black">Password<span class="required">*</span></label>
-                                            <input type="password" class="form-control login-input" id="user-log-pw" autocomplete="off">
+                                            <input type="text" style="-webkit-text-security: disc;" class="form-control login-input" id="user-log-pw" autocomplete="off">
                                         </div>
                                         <div class="form-row mt-4 mb-4 small">
                                             <div class="form-check d-flex align-items-center justify-content-evenly flex-wrap">
@@ -50,6 +50,9 @@
                                     <div class="d-none mt-3 text-danger login-fail">
                                         <p>존재하지 않는 회원입니다.</p>
                                         <p>아이디 또는 비밀번호를 다시 확인하세요.</p>
+                                    </div>
+                                    <div class="d-none mt-3 text-danger more-info">
+                                        <p>정보를 모두 입력 후 시도하세요.</p>
                                     </div>
                                     <div class="new-account mt-5 d-flex align-items-center justify-content-between flex-wrap">
                                         <small class="mb-0"><a th:href="@{/templates/login/social}">소셜 로그인</a></small>
@@ -147,10 +150,34 @@
         window.location.href = `/login/find/${findTarget}`;
     }
 
-    /** 로그인 진행 (로그인 버튼 클릭)*/
-    loginForm.addEventListener('submit', async (e) => {
+    /** 로그인 버튼 클릭 */
+    loginForm.addEventListener('submit', (e) => {
         e.preventDefault(); // 기본 제출 동작 방지
 
+        let allInputsValid = true;
+        loginInputs.forEach((input) => {
+            if (!input.classList.contains('border-primary')) {
+                allInputsValid = false;
+            }
+        });
+
+        if (!allInputsValid) {
+            const moreInfoElement = document.querySelector('.more-info');
+            moreInfoElement.classList.remove('d-none'); // d-none 제거
+
+            // 5초 후 다시 d-none 추가
+            setTimeout(() => {
+                moreInfoElement.classList.add('d-none');
+            }, 3000);
+
+            return;
+        }
+
+        login();
+    });
+
+    /** 로그인 진행 */
+    async function login() {
         try {
             const response = await fetch('/api/login/auth-user', {
                 method: 'POST',
@@ -194,7 +221,7 @@
         } catch (error) {
             console.error('Error:', error);
         }
-    });
+    }
 
     /** 아이디 기억하기 기록 */
     function setRememberId(check, logId) {

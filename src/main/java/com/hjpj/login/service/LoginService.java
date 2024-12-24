@@ -129,20 +129,16 @@ public class LoginService {
     public void signOut(HttpServletRequest request, HttpServletResponse response) {
         String userLogId = request.getHeader(CommonUtil.USER_LOG_ID_NAME);
 
-        int updateRow = userRepository.updateUserStatus(userLogId);
+        redisRepository.deleteById(userLogId);
 
-        if(updateRow > 0) {
-            redisRepository.deleteById(userLogId);
-
-            Cookie[] cookies = request.getCookies();
-            if(cookies != null) {
-                for(Cookie cookie : cookies) {
-                    if(cookie.getName().equals(CommonUtil.ACCESS_TOKEN)) {
-                        cookie.setValue("");
-                        cookie.setPath("/");
-                        cookie.setMaxAge(0);
-                        response.addCookie(cookie);
-                    }
+        Cookie[] cookies = request.getCookies();
+        if(cookies != null) {
+            for(Cookie cookie : cookies) {
+                if(cookie.getName().equals(CommonUtil.ACCESS_TOKEN)) {
+                    cookie.setValue("");
+                    cookie.setPath("/");
+                    cookie.setMaxAge(0);
+                    response.addCookie(cookie);
                 }
             }
         }
