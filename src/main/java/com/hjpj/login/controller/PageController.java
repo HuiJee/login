@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 public class PageController {
 
     /** 일반 로그인 페이지 이동 */
-    @GetMapping("login/generic")
+    @GetMapping({"login/generic", "/"})
     public String loginGeneric() {
         System.out.println("일반 로그인");
         return "login/generic";

@@ -13,22 +13,6 @@ const FALSE = "false";
 const ID = "id";
 const PW = "pw";
 
-
-/** 로그인 여부에 따른 사이드 바 메뉴 수정*/
-const loginBeforeMenu = document.querySelectorAll('.login-before');
-const loginAfterMenu = document.querySelectorAll('.login-after');
-
-loginBeforeMenu.forEach((menu) => {
-    USER_ID !== null ?
-    menu.classList.add('d-none') : menu.classList.remove('d-none');
-});
-
-loginAfterMenu.forEach((menu) => {
-    USER_ID !== null ?
-    menu.classList.remove('d-none') : menu.classList.add('d-none');
-});
-
-
 /** 스토리지 삭제 (로그아웃 시, 리프레시 토큰 만료 시)*/
 function localStorageDel() {
     const rememberValue = SAVED_USER_LOG_ID;
@@ -92,9 +76,4 @@ async function tokenCheckFetch(url, options = {}) {
     }
     return response;
 }
-
-// document.querySelector('.close-btn').addEventListener('click', (e) => {
-//     const parentModal = e.target.closest('.modal');
-//     parentModal.style.display = 'none';
-// });
 
