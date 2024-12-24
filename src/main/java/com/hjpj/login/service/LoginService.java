@@ -32,7 +32,7 @@ public class LoginService {
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
 
-    public Map<String, Object> authUserLogin(HttpServletRequest request, LoginInfoDTO logInfo, HttpServletResponse response) {
+    public UserLogDetail authUserLogin(HttpServletRequest request, LoginInfoDTO logInfo, HttpServletResponse response) {
 
         // 헤더 확인 후 userLogId 추출하기
         String credentials = initialHeaderCheckAndGetLogId(request);
@@ -57,12 +57,8 @@ public class LoginService {
         System.out.println(passwordEncoder.matches(logInfo.getUserLogPw(), userLogDetail.getUserLogPw()));
 
         if (passwordEncoder.matches(logInfo.getUserLogPw(), userLogDetail.getUserLogPw())) {
-            Map<String, Object> result = new HashMap<>();
-            result.put("user", userLogDetail);
-
             System.out.println("성공적으로 로그인 로직 실행!");
-
-            return result;
+            return userLogDetail;
         } else {
             System.out.println("비밀번호 일치하지 않음");
             throw new CustomException(ErrorCode.INVALID_PASSWORD);

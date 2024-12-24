@@ -108,7 +108,7 @@
         </div>
     </div>
 
-    <div class="modal" tabindex="-1" id="noUserModal">
+    <div class="modal align-content-center" tabindex="-1" id="noUserModal">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -131,7 +131,7 @@
         </div>
     </div>
 
-    <div class="modal" tabindex="-1" id="errorOccurModal">
+    <div class="modal align-content-center" tabindex="-1" id="errorOccurModal">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -155,7 +155,7 @@
         </div>
     </div>
 
-    <div class="modal" tabindex="-1" id="timeOutModal">
+    <div class="modal align-content-center" tabindex="-1" id="timeOutModal">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -226,7 +226,7 @@
         e.preventDefault();
 
         try {
-            const response = await fetch(`/login/api/find/${_findTarget.value}`, {
+            const response = await fetch(`/api/login/find/${_findTarget.value}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -309,7 +309,7 @@
         console.log("메일 전송");
         // 인증번호는 로직에서 생성 후 redis에 저장
         try {
-            const response = await fetch(`/mail/send-code`, {
+            const response = await fetch(`/api/mail/send-code`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

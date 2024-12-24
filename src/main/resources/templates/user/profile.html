@@ -54,7 +54,7 @@
     </div>
 </div>
 
-<div class="modal" tabindex="-1" id="confLogoutModal">
+<div class="modal align-content-center" tabindex="-1" id="confLogoutModal">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -95,7 +95,7 @@
 
     /** 회원 정보 찾아와 보여주기 */
     function getUserInfo() {
-        tokenCheckFetch(`/user/`+USER_ID,{
+        tokenCheckFetch(`/api/user/`+USER_ID,{
             headers: {
                 'UserLogId' : USER_LOG_ID
             }
@@ -124,10 +124,15 @@
         confLogoutModal.style.display = 'block';
 
         // 로그아웃 처리(토큰 모두 만료)
+        logout();
 
         // 성공적으로 처리 시 로그인 페이지로 이동
         window.location.href = "/login/generic";
     });
+
+    function logout() {
+        tokenCheckFetch('/api/login/sign-out')
+    }
 
     /** 닫힘 버튼 누를 경우 */
     document.querySelector('.close-btn').addEventListener('click', (e) => {

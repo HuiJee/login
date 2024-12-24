@@ -35,7 +35,14 @@ public class PageController {
     @GetMapping("user/profile")
     public String userProfilePage() {
         System.out.println("로그인 성공!(프로필로...)");
-        return "login/profile";
+        return "user/profile";
+    }
+
+    /** 회원가입 페이지 */
+    @GetMapping("user/register")
+    public String userRegisterPage() {
+        System.out.println("회원가입 페이지");
+        return "user/register";
     }
 
 }

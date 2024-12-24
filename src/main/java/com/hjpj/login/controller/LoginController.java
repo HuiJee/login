@@ -14,14 +14,14 @@ import java.util.Map;
 import java.util.Objects;
 
 @RestController
-@RequestMapping("login")
+@RequestMapping("api/login/")
 @RequiredArgsConstructor
 public class LoginController {
 
     private final LoginService loginService;
 
     /** 아이디 또는 pw 찾기 */
-    @PostMapping("/api/find/{findTarget}")
+    @PostMapping("find/{findTarget}")
     public ResponseEntity<?> findIdOrPw(@PathVariable String findTarget,
                                         @RequestBody User user) {
         Map<String, String> result = Objects.equals(findTarget, CommonUtil.FIND_ID) ?
@@ -31,7 +31,7 @@ public class LoginController {
     }
 
     /** 로그인 진행 */
-    @PostMapping("/api/auth-user")
+    @PostMapping("auth-user")
     public ResponseEntity<?> authUserLogin(HttpServletRequest request,
                                       @RequestBody LoginInfoDTO logInfo,
                                       HttpServletResponse response) {
@@ -40,10 +40,17 @@ public class LoginController {
     }
 
     /** 자동 로그인 정보 가져오기 */
-    @GetMapping("/auto-login")
+    @GetMapping("auto-login")
     public ResponseEntity<?> autoLogin(HttpServletRequest request, HttpServletResponse response) {
         System.out.println("자동로그인 실행");
         return ResponseEntity.ok(loginService.findByUserLogId(request, response));
+    }
+
+    /** 로그아웃 진행 */
+    @PatchMapping("sign-out")
+    public ResponseEntity<?> signOut(HttpServletRequest request, HttpServletResponse response) {
+
+        return ResponseEntity.ok("");
     }
 
 }

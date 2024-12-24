@@ -68,6 +68,10 @@
                                             <span class="fw-semibold">[로그아웃]</span> 시, <span class="fw-semibold">[자동 로그인]</span>은 해제되며 다시 <span class="fw-semibold">[로그인]</span>을 진행해야 합니다.
                                             <br>(이와 달리, <span class="fw-semibold">[아이디 저장]</span> 기능은 그대로 유지됩니다.)
                                         </p>
+                                        <p class="m-3">
+                                            <span class="text-decoration-underline fst-italic">Register</span> 진입 시, 로그아웃 처리 됩니다.
+                                            <br><span class="text-secondary">(실제로는 해당 메뉴가 보이지 않으나, 테스트 프로젝트이므로 전체 메뉴 공개)</span>
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -108,7 +112,7 @@
         if(SAVED_AUTO_LOGIN !== null) {
             console.log('로그인 정보 남아있음 : ', SAVED_AUTO_LOGIN);
             try {
-                const response = await fetch('/login/auto-login', {
+                const response = await fetch('/api/login/auto-login', {
                     headers: {
                         'Authorization' : `Basic ` + btoa(SAVED_AUTO_LOGIN),
                         // btoa를 통해 userLogId를 Base64로 인코딩하여 보낸다.
@@ -148,7 +152,7 @@
         e.preventDefault(); // 기본 제출 동작 방지
 
         try {
-            const response = await fetch('/login/api/auth-user', {
+            const response = await fetch('/api/login/api/auth-user', {
                 method: 'POST',
                 headers: {
                     'Authorization' : `Basic ` + btoa(_userLogId.value),
@@ -179,13 +183,12 @@
                 * */
             }
 
-            const data = await response.json();
-            console.log('data : ', data);
-            localStorage.setItem('userId', data.user.userId);
-            localStorage.setItem('userLogId', data.user.userLogId);
+            const user = await response.json();
+            localStorage.setItem('userId', user.userId);
+            localStorage.setItem('userLogId', user.userLogId);
 
-            setRememberId(rememberId.checked, data.user.userLogId);
-            setAutoLogin(autoLogin.checked, data.user.userLogId);
+            setRememberId(rememberId.checked, user.userLogId);
+            setAutoLogin(autoLogin.checked, user.userLogId);
 
             console.log('Success:', data);
 
@@ -195,7 +198,7 @@
         }
     });
 
-    /** 아이디 기억하기 */
+    /** 아이디 기억하기 기록 */
     function setRememberId(check, logId) {
         if(check) {
             localStorage.setItem('savedUserLogId', logId);
@@ -204,7 +207,7 @@
         }
     }
 
-    /** 자동 로그인 */
+    /** 자동 로그인 기록 */
     function setAutoLogin(check, logId) {
         if(check) {
             localStorage.setItem('savedAutoLogin', logId);
