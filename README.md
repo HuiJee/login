@@ -38,6 +38,9 @@
 - 자동 로그인 체크 후 로그인 시,
   로그인 페이지에 재접근할 경우 자동으로 <span style="text-decoration-line: underline;">4. 프로필</span> 화면으로 이동.
 - 자동 로그인의 경우 RefreshToken의 유효기간은 30일로 설정.
+- 로그아웃하거나 RefreshToken 마저 만료된 경우 로그인 창 접근 가능
+
+https://github.com/user-attachments/assets/8aa73168-4d16-4625-8163-3c2ebdff88be
 
 <br>
 <br>
