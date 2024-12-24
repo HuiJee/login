@@ -7,9 +7,10 @@ import com.hjpj.login.entity.User;
 import com.hjpj.login.exception.CustomException;
 import com.hjpj.login.exception.ErrorCode;
 import com.hjpj.login.jwt.JwtUtil;
+import com.hjpj.login.repository.RedisRepository;
 import com.hjpj.login.repository.UserRepository;
 import com.hjpj.login.util.CommonUtil;
-import io.lettuce.core.ScriptOutputType;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,9 @@ public class LoginService {
     private final UserRepository userRepository;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
+    private final RedisRepository redisRepository;
 
+    /** 로그인 처리 */
     public UserLogDetail authUserLogin(HttpServletRequest request, LoginInfoDTO logInfo, HttpServletResponse response) {
 
         // 헤더 확인 후 userLogId 추출하기
@@ -65,6 +68,7 @@ public class LoginService {
         }
     }
 
+    /** 아이디 찾기 */
     public Map<String, String> findUserId(User user) {
         String userLogId = userRepository.findIdByUserInfo(user.getUserName(), user.getUserEmail(), user.getUserTel());
 
@@ -78,6 +82,7 @@ public class LoginService {
         return result;
     }
 
+    /** 비밀번호 찾기 - 이메일 전달 */
     public Map<String, String> findUserPw(User user) {
         String userEmail = userRepository.findEmailByUserInfo(user.getUserLogId(), user.getUserEmail(), user.getUserTel());
 
@@ -91,7 +96,8 @@ public class LoginService {
         return result;
     }
 
-    public UserDTO findByUserLogId(HttpServletRequest request, HttpServletResponse response) {
+    /** 자동 로그인 시 해당 정보 가져가기 */
+    public UserDTO findUserForAuthLogin(HttpServletRequest request, HttpServletResponse response) {
         // 헤더 확인 후 userLogId 추출하기
         String userLogId = initialHeaderCheckAndGetLogId(request);
 
@@ -117,6 +123,29 @@ public class LoginService {
         String base64Credentials = authHeader.substring(JwtUtil.INITIAL_TYPE.length()).trim();
 
         return new String(Base64.getDecoder().decode(base64Credentials), StandardCharsets.UTF_8);
+    }
+
+    /** 로그아웃 처리 */
+    public void signOut(HttpServletRequest request, HttpServletResponse response) {
+        String userLogId = request.getHeader(CommonUtil.USER_LOG_ID_NAME);
+
+        int updateRow = userRepository.updateUserStatus(userLogId);
+
+        if(updateRow > 0) {
+            redisRepository.deleteById(userLogId);
+
+            Cookie[] cookies = request.getCookies();
+            if(cookies != null) {
+                for(Cookie cookie : cookies) {
+                    if(cookie.getName().equals(CommonUtil.ACCESS_TOKEN)) {
+                        cookie.setValue("");
+                        cookie.setPath("/");
+                        cookie.setMaxAge(0);
+                        response.addCookie(cookie);
+                    }
+                }
+            }
+        }
     }
 
 }

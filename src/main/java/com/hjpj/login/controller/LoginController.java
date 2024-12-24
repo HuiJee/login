@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -43,14 +44,15 @@ public class LoginController {
     @GetMapping("auto-login")
     public ResponseEntity<?> autoLogin(HttpServletRequest request, HttpServletResponse response) {
         System.out.println("자동로그인 실행");
-        return ResponseEntity.ok(loginService.findByUserLogId(request, response));
+        return ResponseEntity.ok(loginService.findUserForAuthLogin(request, response));
     }
 
     /** 로그아웃 진행 */
-    @PatchMapping("sign-out")
+    @Transactional
+    @GetMapping("sign-out")
     public ResponseEntity<?> signOut(HttpServletRequest request, HttpServletResponse response) {
-
-        return ResponseEntity.ok("");
+        loginService.signOut(request, response);
+        return ResponseEntity.ok("로그아웃 처리가 되었습니다.");
     }
 
 }

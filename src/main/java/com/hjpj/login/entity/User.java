@@ -45,11 +45,11 @@ public class User {
     private LocalDateTime userUpdateDate;
 
     @Column(name = "user_status")
-    private String userStatus;
+    private Boolean userStatus;
 
     @PrePersist
     protected void onCreate() {
-        userStatus = "Y";
+        userStatus = true;
         userCreateDate = LocalDateTime.now();
         userUpdateDate = LocalDateTime.now();
     }

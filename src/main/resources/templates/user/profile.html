@@ -127,11 +127,21 @@
         logout();
 
         // 성공적으로 처리 시 로그인 페이지로 이동
-        window.location.href = "/login/generic";
+        // window.location.href = "/login/generic";
     });
 
     function logout() {
-        tokenCheckFetch('/api/login/sign-out')
+        tokenCheckFetch(`/api/login/sign-out`, {
+            headers: {
+                'UserLogId' : USER_LOG_ID
+            }
+        })
+        .then(response => {
+            if(response.ok) {
+                console.log('로그 아웃 처리 완료(로직)')
+                goLoginAgain();
+            }
+        })
     }
 
     /** 닫힘 버튼 누를 경우 */

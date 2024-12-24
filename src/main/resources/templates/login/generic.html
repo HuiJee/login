@@ -152,7 +152,7 @@
         e.preventDefault(); // 기본 제출 동작 방지
 
         try {
-            const response = await fetch('/api/login/api/auth-user', {
+            const response = await fetch('/api/login/auth-user', {
                 method: 'POST',
                 headers: {
                     'Authorization' : `Basic ` + btoa(_userLogId.value),
@@ -189,8 +189,6 @@
 
             setRememberId(rememberId.checked, user.userLogId);
             setAutoLogin(autoLogin.checked, user.userLogId);
-
-            console.log('Success:', data);
 
             location.href = '/user/profile';
         } catch (error) {
