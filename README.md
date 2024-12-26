@@ -1,5 +1,54 @@
+# JWT를 통한 로그인 기능
+프로젝트 당시 처음 접하게 된 jwt 인증에 대해 학습하고자, 로그인 관련 기능들을 정리하게 되었습니다.
+1차로는 로그인 시 토큰을 생성하고 이를 통해 로그인 인증 처리를 진행하고자 합니다.
+추후 2차 프로젝트에서는 해당 토큰에 담긴 권한을 통해 게시판 별 접근 또는 기눙 제한 처리를 진행할 것입니다.
+
+이 외에, 카카오톡 소셜 로그인과 비밀번호 찾기를 위한 메일인증, 카카오맵 API를 활용한 주소 찾기를 함께 구현했습니다.
+
+<br>
+
+## 사용 기술
+Open JDK 17, Spring Boot, Spring Security, JWT, MySQL 8.0.36, Redis, Gradle, KakaoMap API, SMTP API, GitHub, Thymeleaf
+
+<br>
+<hr>
+<br>
+
+# 엔드포인트 정리
+### 1. PageController
+- 일반 로그인 페이지 <code>GET /login/generic</code>
+- ID/PW 찾기 페이지 <code>GET /login/find/{findTarget}</code>
+- 소셜 로그인 페이지 <code>GET /login/social</code>
+- 프로필 페이지 <code>GET /user/profile</code>
+- 회원가입 페이지 <code>GET /user/register</code>
+
+<br>
+
+### 2. LoginController
+- 로그인 <code>POST /api/login/auth-user</code>
+- 로그아웃 <code>GET /api/login/sign-out</code>
+- 자동로그인 <code>GET /api/login/auto-login</code>
+- ID/PW 찾기 <code>POST /api/login/find/{findTarget}</code>
+
+<br>
+
+### 3. UserController
+- refresh 검증 및 access 재발급 <code>POST /api/user/refresh-token</code>
+- 사용자 정보 가져오기(프로필용) <code>GET /api/user/{userId}</code>
+
+<br>
+
+### 4. MailController
+--- 작업중 ---
+
+<br>
+<hr>
+<br>
+
 ## 1. Login 페이지
-![localhost_8080_login_generic (1)](https://github.com/user-attachments/assets/6247d4e9-e7dc-4d70-9437-ac0b4b8feb20)
+![localhost_8080_login_generic (3)](https://github.com/user-attachments/assets/afec9f4f-64cd-47da-8231-3e0a7d59e931)
+
+
 
 ### \# input 작성 시 파란 테두리
 ![image](https://github.com/user-attachments/assets/71c72f80-8e87-4919-8209-863b97c5ef38)
