@@ -8,7 +8,7 @@
 <br>
 
 ## 사용 기술
-Open JDK 17, Spring Boot, Spring Security, JWT, MySQL 8.0.36, Redis, Gradle, KakaoMap API, SMTP API, GitHub, Thymeleaf
+Open JDK 17, Spring Boot, Spring Data JPA, Spring Security, JWT, MySQL 8.0.36, Redis, Gradle, KakaoMap API, SMTP API, GitHub, Thymeleaf
 
 <br>
 <hr>
