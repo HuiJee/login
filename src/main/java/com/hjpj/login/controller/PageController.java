@@ -1,6 +1,7 @@
 package com.hjpj.login.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -26,8 +27,12 @@ public class PageController {
 
     /** 소셜 로그인 페이지 */
     @GetMapping("login/social")
-    public String loginSocial() {
+    public String loginSocial(Model model) {
         System.out.println("소셜 로그인");
+
+//        String location = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id="+kakaoClientId+"&redirect_uri="+kakaoRedirectUri;
+//        model.addAttribute("location", location);
+
         return "login/social";
     }
 
@@ -43,6 +48,12 @@ public class PageController {
     public String userRegisterPage() {
         System.out.println("회원가입 페이지");
         return "user/register";
+    }
+
+    @GetMapping("social/kakao")
+    public String getKakaoPage() {
+        System.out.println("카카오 중간 페이지");
+        return "login/socialInfo";
     }
 
 }

@@ -14,8 +14,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: testnz2412@gmail.com
-    password: y f c p o g b o v a v x r z b d
+    username: { smtp-username }
+    password: { smtp-pw }
     properties:
       mail:
         smtp:
@@ -27,20 +27,28 @@ spring:
           # 클라이언트가 SMTP 서버와의 연결을 설정하는 데 대기해야 하는 시간
           timeout: 5000 #클라이언트가 SMTP 서버로부터 응답을 대기해야 하는 시간
           write-timeout: 5000 #클라이언트가 작업을 완료하는 데 대기해야 하는 시간
+        mime:
+          charset: UTF-8
     auth-code-expiration-millis: 300000 #1000*60*5 = 5분 (이메일 인증코드의 만료 시간)
 
   data:
     redis:
       host: localhost
       port: 6379
-      password: testnz1379
+      password: { redis-pw }
 
 #      username: token-redis
 #      password: token1234
 #      password: AUTH redis1234
 
 jwt:
-  secret: nD6LrnhcgqwN6zR72bV67mF3iXMIqM2krzH9EPS9vY4QaAThNs7e98e3ffw
+  secret: { jwt-secret }
+
+kakao:
+  client-id: { client-id }
+  client-secret: { client-secret }
+  redirect-uri: { 코드 전송할 uri }
+
 
 # mail
 #spring.mail.host=smtp.gmail.com

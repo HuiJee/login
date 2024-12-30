@@ -14,7 +14,9 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -31,7 +33,7 @@ public class TokenService {
         JwtToken token = jwtGenerator.generateToken(authentication, userLogDetail.getAutoLogin());
 
         // access 토큰은 쿠키 생성해서 클라이언트에 전송
-        setTokenCookie(response, token.getAccessToken());
+        this.setTokenCookie(response, token.getAccessToken());
 
         // refresh 토큰은 redis 서버에 저장
         redisRepository.save(new TokenRedis(userLogDetail.getUserLogId(), token.getRefreshToken()));

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <div th:insert="~{fragment/header}"></div>
+</head>
+<body>
+<div class="d-flex" id="wrapper">
+
+    <!-- Sidebar-->
+    <div th:insert="~{fragment/sidebar}"></div>
+
+    <!-- Page content wrapper-->
+    <div id="page-content-wrapper">
+
+        <!-- Page content-->
+        <div class="container-fluid mt-5">
+            <div class="col-xl-12">
+                <div class="row align-items-center">
+                    <div class="card login-card border-0">
+                        <div class="card-body d-flex justify-content-center">
+                            <div class="col-xl-4">
+                                <div class="auth-form">
+                                    <h3 class="text-start mb-4 font-w600">회원 가입</h3>
+                                    <form id="register-form" class="needs-validation" novalidate>
+                                        <div class="form-group mb-3">
+                                            <label class="mb-1 text-black">아이디</label>
+                                            <div class="d-flex">
+                                                <input type="text" class="form-control userLogId me-2" minlength="10"
+                                                       maxlength="20" placeholder="아이디를 입력하세요." autocomplete="off"
+                                                       pattern="^(?=.*[a-z])(?=.*\d)[a-z\d]{6,16}$" required>
+                                                <button type="button" class="btn btn-outline-secondary btn-sm btn-duplicate" style="width: fit-content">중복 검사</button>
+                                            </div>
+<!--                                                <span class="text-danger duplicate-id">중복되는 아이디 입니다.</span>-->
+                                            <div class="text-danger invalid-feedback">영문자(소문자), 숫자 이용하여 10~20자 이내로 입력하세요.</div>
+                                            <div class="text-success valid-feedback">사용 가능한 아이디입니다.</div>
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label class="mb-1 text-black">비밀번호</label>
+                                            <input type="password" class="form-control login-input" id="user-log-pw" autocomplete="off">
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label class="mb-1 text-black">비밀번호 확인</label>
+                                            <input type="password" class="form-control login-input" autocomplete="off">
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label class="mb-1 text-black">이름</label>
+                                            <input type="text" class="form-control login-input" id="user-name" autocomplete="off">
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label class="mb-1 text-black">이메일<span class="required">*</span></label>
+                                            <input type="email" class="form-control login-input" id="user-email" autocomplete="off">
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label class="mb-1 text-black">전화번호</label>
+                                            <input type="text" class="form-control login-input" id="user-tel" autocomplete="off">
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label class="mb-1 text-black">주소</label>
+                                            <input type="text" class="form-control login-input" id="user-addr" autocomplete="off">
+                                        </div>
+                                        <div class="text-end">
+                                            <button type="submit" class="btn btn-outline-success btn-block">회원가입</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:insert="~{fragment/common-script}"></div>
+
+<script>
+
+    const registerForm = document.querySelectorAll('.needs-validation');
+
+    Array.prototype.slice.call(registerForm)
+        .forEach(function (form) {
+            form.addEventListener('submit', function (e) {
+                if(!form.checkValidity()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+
+                form.classList.add('was-validated');
+            }, false)
+        })
+
+</script>
+
+</body>
+</html>
+

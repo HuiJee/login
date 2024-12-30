@@ -47,7 +47,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/static/**", "/public/**", "/resources/static/**", "/META-INF/resources/**",
                                 "/css/**", "/js/**", "/bootstrap/**", "/images/**", "/icons/**", "/favicon.ico", "/fonts/**").permitAll()
-                        .requestMatchers("/login/**", "/user/**", "/api/**").permitAll()
+                        .requestMatchers("/login/**", "/user/**", "/api/**", "/social/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 // 명시적인 설정이 없을 경우, filterChain 통과를 못하면 403이 반환될 수 있기에 설정!

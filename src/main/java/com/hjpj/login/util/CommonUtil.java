@@ -10,4 +10,6 @@ public class CommonUtil {
     public static Integer INVALID_TOKEN_STATUS = 401;
     public static String ACCESS_TOKEN = "accessToken";
 
+    public static String KAKAO = "KAKAO";
+
 }

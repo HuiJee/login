@@ -1,6 +1,7 @@
 package com.hjpj.login.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true, nullable = false, name = "user_id")
     private Long userId;
 
@@ -35,6 +36,9 @@ public class User {
     @Column(name = "user_tel")
     private String userTel;
 
+    @Column(name = "user_addr")
+    private String userAddr;
+
     @Column(name = "user_nickname")
     private String userNickname;
 
@@ -49,9 +53,17 @@ public class User {
 
     @PrePersist
     protected void onCreate() {
+        userRole = "G"; // 초기값은 전부 게스트
         userStatus = true;
         userCreateDate = LocalDateTime.now();
         userUpdateDate = LocalDateTime.now();
+    }
+
+    public User(String userLogId, String userLogPw, String name) {
+        this.userLogId = userLogId;
+        this.userLogPw = userLogPw;
+        this.userName = name;
+        this.userNickname = name;
     }
 
 

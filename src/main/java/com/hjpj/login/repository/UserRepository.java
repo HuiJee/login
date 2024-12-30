@@ -23,7 +23,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "WHERE u.userLogId = :userLogId and u.userEmail = :userEmail and u.userTel = :userTel and u.userStatus = true")
     String findEmailByUserInfo(@Param("userLogId") String userLogId, @Param("userEmail") String userEmail, @Param("userTel") String userTel);
 
-    // 자동로그인 용 정보 찾기
+    // 정보 찾기 (자동로그인, 카카오 비교)
     @Query("SELECT new com.hjpj.login.dto.UserDTO(u.userId, u.userLogId, u.userLogPw, u.userNickname, u.userRole) " +
             "FROM User u WHERE u.userLogId = :userLogId and u.userStatus = true")
     Optional<UserDTO> findUserByUserLogId(@Param("userLogId") String userLogId);
@@ -41,4 +41,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // 아이디 중복 검사
     @Query("SELECT COUNT(1) FROM User u WHERE u.userLogId = :userLogId")
     int countUserLogId(@Param("userLogId") String userLogId);
+    default boolean existsByUserLogId(String userLogId) {return countUserLogId(userLogId) > 0;}
+
 }

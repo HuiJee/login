@@ -37,6 +37,14 @@ public class UserLogDetail implements UserDetails {
         this.userRole = UserRole.getUserRole(user.getUserRole());
     }
 
+    public UserLogDetail(User user) {
+        this.userId = user.getUserId();
+        this.userLogId = user.getUserLogId();
+        this.userLogPw = user.getUserLogPw();
+        this.userNickname = user.getUserNickname();
+        this.userRole = UserRole.getUserRole(user.getUserRole());
+    }
+
 //    public UserLogDetail(UserProjection userProjection) {
 //        this.userId = userProjection.getUserId();
 //        this.userLogId = userProjection.getUserLogId();
