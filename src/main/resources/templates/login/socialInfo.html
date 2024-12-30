@@ -12,7 +12,6 @@
 
 <script>
 
-
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
@@ -23,34 +22,39 @@
                 .then(data => {
                     localStorage.setItem('userId', data.userId);
                     localStorage.setItem('userLogId', data.userLogId);
-                    window.location.href = '/user/profile';  // 로그인 후 이동할 페이지
+                    localStorage.removeItem('savedUserLogId');
+
+                    console.log('userId : ', localStorage.getItem('userId'));
+                    console.log('userLogId : ', localStorage.getItem('userLogId'));
+                    // window.location.href = '/user/profile';  // 로그인 후 이동할 페이지
+                    window.location.href = '/login/generic';  // 로그인 후 이동할 페이지
                 });
         }
     };
 
     //카카오로그인
-    // function kakaoLogin() {
-    //     Kakao.Auth.login({
-    //         success: function (response) {
-    //             Kakao.API.request({
-    //                 url: '/v2/user/me',
-    //                 success: function (response) {
-    //                     console.log(response);
-    //
-    //                     /*
-    //                         reponse에 id 값, connected_at 값,
-    //                     * */
-    //                 },
-    //                 fail: function (error) {
-    //                     console.log(error)
-    //                 },
-    //             })
-    //         },
-    //         fail: function (error) {
-    //             console.log(error)
-    //         },
-    //     })
-    // }
+    function kakaoLogin() {
+        Kakao.Auth.login({
+            success: function (response) {
+                Kakao.API.request({
+                    url: '/v2/user/me',
+                    success: function (response) {
+                        console.log(response);
+
+                        /*
+                            reponse에 id 값, connected_at 값,
+                        * */
+                    },
+                    fail: function (error) {
+                        console.log(error)
+                    },
+                })
+            },
+            fail: function (error) {
+                console.log(error)
+            },
+        })
+    }
     //카카오로그아웃
     function kakaoLogout() {
         if (Kakao.Auth.getAccessToken()) {
