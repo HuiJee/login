@@ -14,8 +14,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: testnz2412@gmail.com
-    password: y f c p o g b o v a v x r z b d
+    username: {gmail username}
+    password: {smtp 용 비밀번호}
     properties:
       mail:
         smtp:
@@ -33,14 +33,10 @@ spring:
     redis:
       host: localhost
       port: 6379
-      password: testnz1379
-
-#      username: token-redis
-#      password: token1234
-#      password: AUTH redis1234
+      password: {redis 비밀번호}
 
 jwt:
-  secret: nD6LrnhcgqwN6zR72bV67mF3iXMIqM2krzH9EPS9vY4QaAThNs7e98e3ffw
+  secret: {jwt.secret 키}
 
 # mail
 #spring.mail.host=smtp.gmail.com
