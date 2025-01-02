@@ -48,11 +48,11 @@ public class KakaoService {
     public UserLogDetail getTokenAndRegisterCheck(String code, HttpServletResponse response) {
         // 발급된 토큰 정보 가져오기
         KakaoResponseDTO kakaoToken = this.getTokenFromKakao(code);
-        
+
         // 로그인 또는 회원 가입
         UserLogDetail userLogDetail = this.getUserInfo(kakaoToken.getAccessToken());
-        
-        // 토큰 저장 절차
+
+        // 자체 토큰 발급 및 저장
         this.makeAuthAndSaveToken(userLogDetail, kakaoToken, response);
 
         return userLogDetail;
@@ -160,11 +160,8 @@ public class KakaoService {
         // SecurityContext에 설정
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        // AccessToken은 쿠키 저장
-        tokenService.setTokenCookie(response, kakaoResponseDTO.getAccessToken());
-
-        // refresh 토큰은 redis 서버에 저장
-        redisRepository.save(new TokenRedis(userLogDetail.getUserLogId(), kakaoResponseDTO.getRefreshToken()));
+        // 자체 토큰 생성 및 저장
+        tokenService.makeTokenAndCookie(auth, userLogDetail, response);
     }
 
 }

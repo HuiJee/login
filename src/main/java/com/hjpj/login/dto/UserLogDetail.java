@@ -9,10 +9,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor
@@ -35,14 +33,17 @@ public class UserLogDetail implements UserDetails {
         this.userLogPw = user.getUserLogPw();
         this.userNickname = user.getUserNickname();
         this.userRole = UserRole.getUserRole(user.getUserRole());
+        this.autoLogin = false;
     }
 
+    // 카톡 로그인 용
     public UserLogDetail(User user) {
         this.userId = user.getUserId();
         this.userLogId = user.getUserLogId();
         this.userLogPw = user.getUserLogPw();
         this.userNickname = user.getUserNickname();
         this.userRole = UserRole.getUserRole(user.getUserRole());
+        this.autoLogin = false;
     }
 
 //    public UserLogDetail(UserProjection userProjection) {

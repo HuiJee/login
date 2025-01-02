@@ -1,77 +1,72 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <div th:insert="~{fragment/header}"></div>
 </head>
-<body>
-<div class="d-flex" id="wrapper">
 
+    <div th:insert="~{fragment/common-script}"></div>
 
-<div th:insert="~{fragment/common-script}"></div>
+    <script>
 
-<script>
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
 
-    window.onload = function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code');
+            console.log('code : ' , code);
 
-        if (code) {
-            fetch('/social/kakao/token?code=' + code)
-                .then(response => response.json())
-                .then(data => {
-                    localStorage.setItem('userId', data.userId);
-                    localStorage.setItem('userLogId', data.userLogId);
-                    localStorage.removeItem('savedUserLogId');
+            if (code) {
+                fetch('/social/kakao/token?code=' + code)
+                    .then(response => response.json())
+                    .then(data => {
 
-                    console.log('userId : ', localStorage.getItem('userId'));
-                    console.log('userLogId : ', localStorage.getItem('userLogId'));
-                    // window.location.href = '/user/profile';  // 로그인 후 이동할 페이지
-                    window.location.href = '/login/generic';  // 로그인 후 이동할 페이지
-                });
-        }
-    };
+                        console.log('data : ', data);
 
-    //카카오로그인
-    function kakaoLogin() {
-        Kakao.Auth.login({
-            success: function (response) {
-                Kakao.API.request({
-                    url: '/v2/user/me',
-                    success: function (response) {
-                        console.log(response);
+                        localStorage.setItem('userId', data.userId);
+                        localStorage.setItem('userLogId', data.userLogId);
+                        localStorage.removeItem('savedUserLogId');
 
-                        /*
-                            reponse에 id 값, connected_at 값,
-                        * */
-                    },
-                    fail: function (error) {
-                        console.log(error)
-                    },
-                })
-            },
-            fail: function (error) {
-                console.log(error)
-            },
-        })
-    }
-    //카카오로그아웃
-    function kakaoLogout() {
-        if (Kakao.Auth.getAccessToken()) {
-            Kakao.API.request({
-                url: '/v1/user/unlink',
+                        window.location.href = '/user/profile';  // 로그인 후 이동할 페이지
+                    });
+            }
+        };
+
+        //카카오로그인
+        function kakaoLogin() {
+            Kakao.Auth.login({
                 success: function (response) {
-                    console.log(response)
+                    Kakao.API.request({
+                        url: '/v2/user/me',
+                        success: function (response) {
+                            console.log(response);
+
+                            /*
+                                reponse에 id 값, connected_at 값,
+                            * */
+                        },
+                        fail: function (error) {
+                            console.log(error)
+                        },
+                    })
                 },
                 fail: function (error) {
                     console.log(error)
                 },
             })
-            Kakao.Auth.setAccessToken(undefined)
         }
-    }
+        //카카오로그아웃
+        function kakaoLogout() {
+            if (Kakao.Auth.getAccessToken()) {
+                Kakao.API.request({
+                    url: '/v1/user/unlink',
+                    success: function (response) {
+                        console.log(response)
+                    },
+                    fail: function (error) {
+                        console.log(error)
+                    },
+                })
+                Kakao.Auth.setAccessToken(undefined)
+            }
+        }
 
-</script>
-
-</body>
-</html>
+    </script>

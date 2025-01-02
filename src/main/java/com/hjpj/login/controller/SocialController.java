@@ -1,12 +1,10 @@
 package com.hjpj.login.controller;
 
-import com.hjpj.login.dto.KakaoUserInfoDTO;
 import com.hjpj.login.dto.UserLogDetail;
 import com.hjpj.login.service.KakaoService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +31,8 @@ public class SocialController {
     }
 
     @GetMapping("kakao/token")
-    public ResponseEntity<?> getKokaoCode(@RequestParam("code") String code, HttpServletResponse response) throws IOException {
+    public ResponseEntity<?> getTokenAndRegisterCheck(@RequestParam("code") String code, HttpServletResponse response) throws IOException {
+        System.out.println("카카오 토큰 발급");
         UserLogDetail user = kakaoService.getTokenAndRegisterCheck(code, response);
         return ResponseEntity.ok(user);
     }
