@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @RestController
-@RequestMapping("api/login/")
+@RequestMapping("/api/login/")
 @RequiredArgsConstructor
 public class LoginController {
 

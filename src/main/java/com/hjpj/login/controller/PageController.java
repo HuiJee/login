@@ -50,10 +50,10 @@ public class PageController {
         return "user/register";
     }
 
-    @GetMapping("social/kakao")
-    public String getKakaoPage() {
-        System.out.println("카카오 중간 페이지");
-        return "login/socialInfo";
-    }
+//    @GetMapping("social/kakao")
+//    public String getKakaoPage() {
+//        System.out.println("카카오 중간 페이지");
+//        return "login/socialInfo";
+//    }
 
 }

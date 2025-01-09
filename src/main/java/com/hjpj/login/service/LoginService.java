@@ -128,6 +128,7 @@ public class LoginService {
     /** 로그아웃 처리 */
     public void signOut(HttpServletRequest request, HttpServletResponse response) {
         String userLogId = request.getHeader(CommonUtil.USER_LOG_ID_NAME);
+        Integer loginType = userRepository.userLoginType(userLogId);
 
         redisRepository.deleteById(userLogId);
 
@@ -141,6 +142,21 @@ public class LoginService {
                     response.addCookie(cookie);
                 }
             }
+        }
+
+        if(loginType != 0) {
+            this.signOutSocial(loginType);
+        }
+    }
+
+    public void signOutSocial(Integer loginType) {
+        switch(loginType) {
+            case 1:
+                break;
+            case 2:
+                break;
+            default:
+                break;
         }
     }
 

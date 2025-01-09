@@ -55,7 +55,10 @@
                                         <p>정보를 모두 입력 후 시도하세요.</p>
                                     </div>
                                     <div class="new-account mt-5 d-flex align-items-center justify-content-between flex-wrap">
-                                        <small class="mb-0"><a th:href="@{/login/social}">소셜 로그인</a></small>
+<!--                                        <small class="mb-0"><a th:href="@{/login/social}">소셜 로그인</a></small>-->
+                                        <a class="kakao-login">
+                                            <img th:src="@{/images/kakao_login_small.png}"/>
+                                        </a>
                                         <div>
                                             <small><a onclick="goFindForm('id');">아이디 찾기</a></small>
                                             &nbsp/&nbsp
@@ -227,6 +230,11 @@
             localStorage.removeItem('savedAutoLogin');
         }
     }
+
+    /** 카카오 로그인 */
+    document.querySelector('.kakao-login').addEventListener('click', () => {
+        location.href = '/oauth/kakao/code';
+    });
 
     window.onload = init;
 </script>

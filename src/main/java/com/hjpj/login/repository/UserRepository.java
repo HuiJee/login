@@ -23,10 +23,15 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "WHERE u.userLogId = :userLogId and u.userEmail = :userEmail and u.userTel = :userTel and u.userStatus = true")
     String findEmailByUserInfo(@Param("userLogId") String userLogId, @Param("userEmail") String userEmail, @Param("userTel") String userTel);
 
-    // 정보 찾기 (자동로그인, 카카오 비교)
+    // 정보 찾기 (자동로그인 비교)
     @Query("SELECT new com.hjpj.login.dto.UserDTO(u.userId, u.userLogId, u.userLogPw, u.userNickname, u.userRole) " +
             "FROM User u WHERE u.userLogId = :userLogId and u.userStatus = true")
     Optional<UserDTO> findUserByUserLogId(@Param("userLogId") String userLogId);
+
+    // 소셜 로그인 대상 찾기
+    @Query("SELECT new com.hjpj.login.dto.UserDTO(u.userId, u.userLogId, u.userLogPw, u.userNickname, u.userRole) " +
+            "FROM User u WHERE u.userLogId = :userLogId AND u.loginType = :loginType")
+    Optional<UserDTO> findUserBySocialInfo(@Param("userLogId") String userLogId, @Param("loginType") Integer loginType);
 
     // 프로필 설정 용
     @Query("SELECT new com.hjpj.login.dto.UserDTO(u.userId, u.userLogId, null, u.userNickname, u.userRole) " +
@@ -43,4 +48,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     int countUserLogId(@Param("userLogId") String userLogId);
     default boolean existsByUserLogId(String userLogId) {return countUserLogId(userLogId) > 0;}
 
+    // 로그인 타입 확인
+    @Query("SELECT u.loginType FROM User u WHERE u.userLogId = :userLogId")
+    Integer userLoginType(@Param("userLogId") String userLogId);
 }

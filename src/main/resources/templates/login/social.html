@@ -42,7 +42,14 @@
 
 
     document.querySelector('.kakao-login').addEventListener('click', () => {
-        location.href = '/social/kakao/code';
+        // location.href = '/social/kakao/code';
+
+        fetch(`/social/kakao/code`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('data : ', data);
+            })
+
     });
 
 </script>

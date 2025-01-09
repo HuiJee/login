@@ -82,6 +82,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 requestURI.startsWith("/api/login/") ||        // 로그인 검증, 자동 로그인, 로그아웃
                 requestURI.startsWith("/login/find/") ||        // 정보 찾기 페이지
                 requestURI.startsWith("/social/") ||
+                requestURI.startsWith("/oauth/") ||
                 requestURI.equals("/user/profile") ||           // 프로필(로그인 결과 창)
                 requestURI.equals("/user/register") ||           // 회원 가입 창
                 requestURI.equals("/api/user/refresh-token") ||     // 리프레시 토큰으로 재발급

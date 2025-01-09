@@ -51,6 +51,9 @@ public class User {
     @Column(name = "user_status")
     private Boolean userStatus;
 
+    @Column(name = "login_type")
+    private Integer loginType;
+
     @PrePersist
     protected void onCreate() {
         userRole = "G"; // 초기값은 전부 게스트
@@ -59,11 +62,20 @@ public class User {
         userUpdateDate = LocalDateTime.now();
     }
 
-    public User(String userLogId, String userLogPw, String name) {
+    public User(String userLogId, String userLogPw, String name, String nickname) {
+        this.userLogId = userLogId;
+        this.userLogPw = userLogPw;
+        this.userName = name;
+        this.userNickname = nickname;
+        this.loginType = 0;
+    }
+
+    public User(String userLogId, String userLogPw, String name, Integer loginType) {
         this.userLogId = userLogId;
         this.userLogPw = userLogPw;
         this.userName = name;
         this.userNickname = name;
+        this.loginType = loginType;
     }
 
 
