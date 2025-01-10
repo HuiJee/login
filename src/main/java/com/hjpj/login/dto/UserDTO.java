@@ -1,11 +1,10 @@
 package com.hjpj.login.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.hjpj.login.entity.User;
+import lombok.*;
 
 @Getter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDTO {
@@ -16,4 +15,12 @@ public class UserDTO {
     private String userNickname;
     @Setter
     private String userRole;
+
+    public UserDTO(User user) {
+        this.userId = user.getUserId();
+        this.userLogId = user.getUserLogId();
+        this.userLogPw = user.getUserLogPw();
+        this.userNickname = user.getUserNickname();
+        this.userRole = user.getUserRole();
+    }
 }

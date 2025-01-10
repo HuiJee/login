@@ -16,6 +16,10 @@
         <!-- Page content-->
         <div class="container-fluid">
             <h1 class="mt-4">소셜 로그인</h1>
+            <a class="kakao-login">
+                <img th:src="@{/images/kakao_login_small.png}"/>
+            </a>
+
             <p>The starting state of the menu will appear collapsed on smaller screens, and will appear non-collapsed on
                 larger screens. When toggled using the button below, the menu will change.</p>
             <p>
@@ -30,6 +34,25 @@
 </div>
 
 <div th:insert="~{fragment/common-script}"></div>
+
+<!-- 카카오 스크립트 -->
+<script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+
+<script>
+
+
+    document.querySelector('.kakao-login').addEventListener('click', () => {
+        // location.href = '/social/kakao/code';
+
+        fetch(`/social/kakao/code`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('data : ', data);
+            })
+
+    });
+
+</script>
 
 </body>
 </html>

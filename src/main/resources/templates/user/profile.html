@@ -54,7 +54,7 @@
     </div>
 </div>
 
-<div class="modal" tabindex="-1" id="confLogoutModal">
+<div class="modal align-content-center" tabindex="-1" id="confLogoutModal">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -79,25 +79,49 @@
     </div>
 </div>
 
+<div class="social-user" th:if="${user != null}">
+    <input type="hidden" id="social_user_id" th:value="${user.userId}">
+    <input type="hidden" id="social_user_log_id" th:value="${user.userLogId}">
+    <input type="hidden" id="social_type" th:value="${social}">
+</div>
+
 <div th:insert="~{fragment/common-script}"></div>
 
-<script>
+<script th:inline="javascript">
 
-    function init() {
+    // let USER_ID, USER_LOG_ID, LOGIN_TYPE;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const socialUser = document.querySelector('.social-user');
+        if(socialUser) {
+            socialInfoSet();
+        }
         getUserInfo();
+    });
+
+    function socialInfoSet() {
+        const socialUserId = document.querySelector('#social_user_id').value;
+        const socialUserLogId = document.querySelector('#social_user_log_id').value;
+        const socialType = document.querySelector('#social_type').value;
+
+        localStorage.setItem('userId', socialUserId);
+        localStorage.setItem('userLogId', socialUserLogId);
+        localStorage.setItem('loginType', socialType);
+
+        updateGlobalVariables();    // 페이지 로드 후 localStorage에 저장하므로 전역변수 다시 초기화
     }
 
-    const _userLogId = document.querySelector('#user-log-id');          // 아이디 보여주는 input
-    const _userNickname = document.querySelector('#user-nickname');     // 닉네임 보여주는 input
-    const _userRole = document.querySelector('#user-role');             // 권한 보여주는 input
+    const _userLogId = document.querySelector('#user-log-id'); // 아이디 보여주는 input
+    const _userNickname = document.querySelector('#user-nickname'); // 닉네임 보여주는 input
+    const _userRole = document.querySelector('#user-role'); // 권한 보여주는 input
 
     const confLogoutModal = document.querySelector('#confLogoutModal'); // 로그아웃 확인 모달
 
     /** 회원 정보 찾아와 보여주기 */
     function getUserInfo() {
-        tokenCheckFetch(`/user/`+USER_ID,{
+        tokenCheckFetch(`/api/user/` + USER_ID, {
             headers: {
-                'UserLogId' : USER_LOG_ID
+                'UserLogId': USER_LOG_ID
             }
         })
         .then(response => response.json())
@@ -106,37 +130,65 @@
         });
     }
 
-    /** 가져온 회원 정보 보여주기 */
+        /** 가져온 회원 정보 보여주기 */
     function setUserInfo(user) {
         _userLogId.value = user.userLogId;
         _userNickname.value = user.userNickname;
         _userRole.value = user.userRole;
     }
 
-    /** 로그아웃 버튼 클릭 */
+        /** 로그아웃 버튼 클릭 */
     document.querySelector('.logout-btn').addEventListener('click', () => {
         confLogoutModal.style.display = 'block';
     });
 
-    /** 로그아웃 conf모달 확인 버튼 클릭 */
+        /** 로그아웃 conf모달 확인 버튼 클릭 */
     document.querySelector('.ok-logout-btn').addEventListener('click', () => {
         // 모달 닫기
         confLogoutModal.style.display = 'block';
 
         // 로그아웃 처리(토큰 모두 만료)
-
-        // 성공적으로 처리 시 로그인 페이지로 이동
-        window.location.href = "/login/generic";
+        logout();
     });
+
+    function logout() {
+        let logoutUrl;
+
+        switch(LOGIN_TYPE) {
+            case KAKAO:
+                console.log("카카오 로그아웃");
+                logoutUrl = "/oauth/kakao/logout";
+                break;
+            case NAVER:
+                console.log("네이버 로그아웃");
+                break;
+            case GOOGLE:
+                console.log("구글 로그아웃");
+                break;
+            default:
+                console.log("일반 로그아웃");
+                logoutUrl = "/api/login/sign-out";
+                break;
+        }
+
+        tokenCheckFetch(logoutUrl, {
+            headers: {
+                'UserLogId': USER_LOG_ID
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log('로그 아웃 처리 완료(로직)');
+                goLoginAgain();
+            }
+        });
+    }
 
     /** 닫힘 버튼 누를 경우 */
     document.querySelector('.close-btn').addEventListener('click', (e) => {
         const parentModal = e.target.closest('.modal');
         parentModal.style.display = 'none';
     });
-
-    window.onload = init;
-
 </script>
 
 </body>

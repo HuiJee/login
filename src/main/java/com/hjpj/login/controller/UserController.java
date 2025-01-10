@@ -6,11 +6,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("user")
+@RequestMapping("api/user/")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -18,7 +17,7 @@ public class UserController {
     private final UserService userService;
 
     /** 리프레시 토큰으로 access 재발급*/
-    @PostMapping("/refresh-token")
+    @PostMapping("refresh-token")
     public ResponseEntity<?> getAccessFromRefresh(HttpServletRequest request, HttpServletResponse response) {
         System.out.println("access from refresh");
         tokenService.getAccessFromRefreshByUserLogId(request, response);
@@ -26,7 +25,7 @@ public class UserController {
     }
 
     /** user 정보 가져오기 */
-    @GetMapping("/{userId}")
+    @GetMapping("{userId}")
     public ResponseEntity<?> getUser(@PathVariable Long userId) {
         return ResponseEntity.ok(userService.findByUserId(userId));
     }
