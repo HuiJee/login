@@ -201,6 +201,7 @@
             const user = await response.json();
             localStorage.setItem('userId', user.userId);
             localStorage.setItem('userLogId', user.userLogId);
+            localStorage.setItem('loginType', GENERIC);
 
             setRememberId(rememberId.checked, user.userLogId);
             setAutoLogin(autoLogin.checked, user.userLogId);

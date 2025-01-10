@@ -5,16 +5,20 @@ import com.hjpj.login.dto.UserDTO;
 import com.hjpj.login.dto.UserLogDetail;
 import com.hjpj.login.external.KakaoInfo;
 import com.hjpj.login.service.KakaoService;
+import com.hjpj.login.service.LoginService;
 import com.hjpj.login.util.CommonUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 
@@ -30,6 +34,7 @@ public class OAuthController {
     private String kakaoRedirectUri;
 
     private final KakaoService kakaoService;
+    private final LoginService loginService;
 
     @GetMapping("kakao/code")
     public void getKakaoCode(HttpServletResponse response) throws IOException {
@@ -50,7 +55,7 @@ public class OAuthController {
 //    }
 
     @GetMapping("/kakao/callback")
-    public String kakaoCallback(String code, HttpSession session, Model model, HttpServletResponse response) {
+    public String kakaoCallback(String code, HttpSession session, RedirectAttributes redirectAttributes, HttpServletResponse response) {
 
         System.out.println("콜백 들어오기");
 
@@ -89,11 +94,38 @@ public class OAuthController {
 //            session.setAttribute("kakaoToken", accessToken);
 //        }
         if(kakaoMember != null) {
-//            session.setAttribute("user", kakaoMember);
-            model.addAttribute("user", kakaoMember);
-            model.addAttribute("social", CommonUtil.KAKAO);
+            session.setAttribute("kakaoToken", accessToken);
+            redirectAttributes.addFlashAttribute("user", kakaoMember);
+            redirectAttributes.addFlashAttribute("social", CommonUtil.KAKAO);
         }
 
-        return "user/profile";
+        // 짧은 데이터 전달 : url에 parameter로 넣어서
+        // 로그인 반복 정보 전달 :  session에 담아서 타임리프로 session.이름
+        // 임시 데이터 전달 : Flash Attributes 사용하기
+        // redirect의 경우 model로 전달하면 데이터가 넘어가지 않는다!!
+
+        return "redirect:/user/profile";
+    }
+
+    @GetMapping("/kakao/logout")
+    public ResponseEntity<?> kakaoLogout(HttpSession session, HttpServletRequest request, HttpServletResponse response) {
+        String accessToken = (String) session.getAttribute("kakaoToken");
+
+        if(accessToken != null && !"".equals(accessToken)){
+            try {
+                loginService.signOut(request, response);
+                kakaoService.kakaoDisconnect(accessToken);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+            session.removeAttribute("kakaoToken");
+        }else{
+            System.out.println("accessToken is null");
+        }
+
+        // 자체 토큰 지우기
+        String userLogId = request.getHeader(CommonUtil.USER_LOG_ID_NAME);
+        
+        return ResponseEntity.ok().build();
     }
 }

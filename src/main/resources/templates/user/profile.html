@@ -85,26 +85,31 @@
     <input type="hidden" id="social_type" th:value="${social}">
 </div>
 
-
 <div th:insert="~{fragment/common-script}"></div>
 
 <script th:inline="javascript">
 
-    function init() {
+    // let USER_ID, USER_LOG_ID, LOGIN_TYPE;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const socialUser = document.querySelector('.social-user');
         if(socialUser) {
-            const socialUserId = document.querySelector('#social_user_id').value;
-            const socialUserLogId = document.querySelector('#social_user_log_id').value;
-            const socialType = document.querySelector('#social_type').value;
-
-            localStorage.setItem('userId', socialUserId);
-            localStorage.setItem('userLogId', socialUserLogId);
-            localStorage.setItem('social', socialType);
+            socialInfoSet();
         }
-
         getUserInfo();
-    }
+    });
 
-    const socialUser = document.querySelector('.social-user');
+    function socialInfoSet() {
+        const socialUserId = document.querySelector('#social_user_id').value;
+        const socialUserLogId = document.querySelector('#social_user_log_id').value;
+        const socialType = document.querySelector('#social_type').value;
+
+        localStorage.setItem('userId', socialUserId);
+        localStorage.setItem('userLogId', socialUserLogId);
+        localStorage.setItem('loginType', socialType);
+
+        updateGlobalVariables();    // 페이지 로드 후 localStorage에 저장하므로 전역변수 다시 초기화
+    }
 
     const _userLogId = document.querySelector('#user-log-id'); // 아이디 보여주는 input
     const _userNickname = document.querySelector('#user-nickname'); // 닉네임 보여주는 input
@@ -144,43 +149,39 @@
 
         // 로그아웃 처리(토큰 모두 만료)
         logout();
-
-        // 성공적으로 처리 시 로그인 페이지로 이동
-        // window.location.href = "/login/generic";
     });
 
     function logout() {
-        if(socialUser) {
-            const socialType = document.querySelector('#social_type').value;
-            console.log('social : ', socialType);
-            socialLogout(socialType);
-        }
+        let logoutUrl;
 
-        // tokenCheckFetch(`/api/login/sign-out`, {
-        //     headers: {
-        //         'UserLogId': USER_LOG_ID
-        //     }
-        // })
-        // .then(response => {
-        //     if (response.ok) {
-        //         console.log('로그 아웃 처리 완료(로직)')
-        //         goLoginAgain();
-        //     }
-        // })
-    }
-
-    function socialLogout(socialName) {
-        switch (socialName) {
-            case KAKAO :
-                console.log('카카오 로그인!');
+        switch(LOGIN_TYPE) {
+            case KAKAO:
+                console.log("카카오 로그아웃");
+                logoutUrl = "/oauth/kakao/logout";
                 break;
-            case NAVER :
-                console.log('네이버 로그인!');
+            case NAVER:
+                console.log("네이버 로그아웃");
                 break;
             case GOOGLE:
-                console.log('구글 로그인!');
+                console.log("구글 로그아웃");
+                break;
+            default:
+                console.log("일반 로그아웃");
+                logoutUrl = "/api/login/sign-out";
                 break;
         }
+
+        tokenCheckFetch(logoutUrl, {
+            headers: {
+                'UserLogId': USER_LOG_ID
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log('로그 아웃 처리 완료(로직)');
+                goLoginAgain();
+            }
+        });
     }
 
     /** 닫힘 버튼 누를 경우 */
@@ -188,9 +189,6 @@
         const parentModal = e.target.closest('.modal');
         parentModal.style.display = 'none';
     });
-
-    window.onload = init;
-
 </script>
 
 </body>

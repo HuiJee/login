@@ -143,21 +143,6 @@ public class LoginService {
                 }
             }
         }
-
-        if(loginType != 0) {
-            this.signOutSocial(loginType);
-        }
-    }
-
-    public void signOutSocial(Integer loginType) {
-        switch(loginType) {
-            case 1:
-                break;
-            case 2:
-                break;
-            default:
-                break;
-        }
     }
 
 }
