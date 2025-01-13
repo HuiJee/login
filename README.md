@@ -38,7 +38,15 @@ Open JDK 17, Spring Boot, Spring Data JPA, Spring Security, JWT, MySQL 8.0.36, R
 
 <br>
 
-### 4. MailController
+### 5. OAuthController
+- 카카오 코드 발급 <code>GET /oauth/kakao/code</code>
+- 카카오 콜백 (토큰 및 정보 받기) <code>GET /oauth/kakao/callback</code>
+- 카카오 로그아웃 <code>GET /oauth/kakao/logout</code>
+--- 다른 소셜 로그인 작업 예정 ---
+
+<br>
+
+### 5. MailController
 --- 작업중 ---
 
 <br>
@@ -46,8 +54,7 @@ Open JDK 17, Spring Boot, Spring Data JPA, Spring Security, JWT, MySQL 8.0.36, R
 <br>
 
 ## 1. Login 페이지
-![localhost_8080_login_generic (3)](https://github.com/user-attachments/assets/afec9f4f-64cd-47da-8231-3e0a7d59e931)
-
+![localhost_8080_login_generic (5)](https://github.com/user-attachments/assets/1969f0e8-ee36-45ff-bb06-fcac7125f67d)
 
 
 ### \# input 작성 시 파란 테두리
@@ -90,6 +97,12 @@ Open JDK 17, Spring Boot, Spring Data JPA, Spring Security, JWT, MySQL 8.0.36, R
 - 로그아웃하거나 RefreshToken 마저 만료된 경우 로그인 창 접근 가능
 
 https://github.com/user-attachments/assets/8aa73168-4d16-4625-8163-3c2ebdff88be
+
+- 자동 로그인은 아니지만, 실수로 창을 닫은 경우 refresh의 존재 여부에 따라 자동 로그인 처리.
+
+https://github.com/user-attachments/assets/98ba6694-9568-4322-9c1d-e7cf80651b62
+
+
 
 <br>
 <br>
@@ -155,4 +168,20 @@ LocalStorage에 있는 [기억하기]를 제외한 모든 정보를 삭제 후 �
 <br>
 
 ## 7. 소셜 로그인(Kakao)
+![localhost_8080_login_generic (5)](https://github.com/user-attachments/assets/0647c0e9-8316-4b12-9bac-3486145625b5)
+
+- 로그인 페이지 내에서 해당 버튼을 생성
+
+![image](https://github.com/user-attachments/assets/f6bc679d-4707-4f9a-b85c-a982a874c87d)
+- 카카오 api를 통해 작업을 진행
+- 클릭 시, 다른 사이트에서 보던 카카오 로그인 화면으로 이동
+
+![image](https://github.com/user-attachments/assets/3a9f6ec3-3193-4912-8fbd-719a91e8f94c)
+- 로그인 시, 카카오 자체에서 부여하는 id 번호에 "Kakao"를 붙여 구분
+- 콜백 절차를 통합하여, 코드 발급, 토큰 발급, 카카오 정보 발급을 진행
+- 회원 존재하는 경우 바로 로그인 처리 / 존재하지 않는 경우 INSERT 후 로그인 처리
+  (회원가입 절차 진행 완성 시, 비회원은 해당 페이지로 이동할 예정)
+- 자체 토큰을 별도로 발급하여 세션 유지 등의 기능을 실행
+  
+
 
