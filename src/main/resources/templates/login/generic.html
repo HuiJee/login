@@ -38,7 +38,7 @@
                                                     <label class="custom-control-label ms-1 text-secondary" for="auto_login">자동 로그인</label>
                                                 </div>
                                                 <div class="mb-1">
-                                                    <input type="checkbox" class="form-check-input" id="remember_id">
+                                                    <input type="checkbox" class="form-check-input" id="remember_id" checked>
                                                     <label class="custom-control-label ms-1 text-secondary" for="remember_id">아이디 저장</label>
                                                 </div>
                                             </div>
@@ -80,12 +80,14 @@
 <script>
 
     function init() {
-        console.log('autoLogin : ', SAVED_AUTO_LOGIN);
-        console.log('savedId : ', SAVED_USER_LOG_ID);
-
         // 자동 로그인 확인하기
         if(SAVED_AUTO_LOGIN !== null) {
             isAutoLoginBefore();
+        }
+
+        // 세션만 닫은 경우 기존 회원 리프레시 존재 여부 찾아서 로그인 시키기
+        if(USER_ID !== null && USER_LOG_ID !==null) {
+            existsPrevRefresh();
         }
 
         /** 아이디 기억하기의 경우 마지막 로그인한 ID 보여주기 */
@@ -127,6 +129,27 @@
             }
         } catch (error) {
             console.error('Error:', error);
+        }
+    }
+
+    /** 세션 닫아도 리프레시 존재하는 경우 로그인 처리 */
+    async function existsPrevRefresh() {
+        try {
+            const refreshTokenResponse = await checkRefreshToken();
+
+            console.log(refreshTokenResponse.status);
+
+            if (refreshTokenResponse.ok) {
+                console.log('refreshToken 존재!');
+                // 리프레시 토큰으로 access 생성 후 다시 기능 시도
+                location.href = '/user/profile';
+            } else {
+                console.error('Failed to refresh token:', refreshTokenResponse.status);
+                // goLoginAgain();
+                throw new Error('Unable to refresh token');
+            }
+        } catch(error) {
+            console.error('Error : ', error);
         }
     }
 

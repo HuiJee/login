@@ -44,6 +44,15 @@ function goLoginAgain() {
     window.location.href="/login/generic";
 }
 
+async function checkRefreshToken() {
+    return await fetch('/api/user/refresh-token', {
+        headers: {
+            'UserLogId': USER_LOG_ID,
+        },
+        method: 'POST',
+    });
+}
+
 /** 기능 실행 시 쿠키 확인하고 진행 (access 만료 시 refresh로 재발급)*/
 async function tokenCheckFetch(url, options = {}) {
 
@@ -62,14 +71,7 @@ async function tokenCheckFetch(url, options = {}) {
     if (response.status === 401) {
         console.log("AccessToken expired, attempting to refresh...");
 
-        const refreshTokenResponse = await fetch('/user/refresh-token', {
-            headers: {
-                'UserLogId': USER_LOG_ID,
-            },
-            method: 'POST',
-        });
-
-        console.log(refreshTokenResponse.status);
+        const refreshTokenResponse = await checkRefreshToken();
 
         if (refreshTokenResponse.ok) {
             console.log('refreshToken 존재!');

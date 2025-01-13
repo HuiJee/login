@@ -25,17 +25,6 @@ public class PageController {
         return "login/findForm";
     }
 
-    /** 소셜 로그인 페이지 */
-    @GetMapping("login/social")
-    public String loginSocial(Model model) {
-        System.out.println("소셜 로그인");
-
-//        String location = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id="+kakaoClientId+"&redirect_uri="+kakaoRedirectUri;
-//        model.addAttribute("location", location);
-
-        return "login/social";
-    }
-
     /** 프로필 페이지 (로그인 결과창) */
     @GetMapping("user/profile")
     public String userProfilePage() {
@@ -49,11 +38,5 @@ public class PageController {
         System.out.println("회원가입 페이지");
         return "user/register";
     }
-
-//    @GetMapping("social/kakao")
-//    public String getKakaoPage() {
-//        System.out.println("카카오 중간 페이지");
-//        return "login/socialInfo";
-//    }
 
 }
