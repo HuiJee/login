@@ -107,8 +107,8 @@ public class OAuthController {
         return "redirect:/user/profile";
     }
 
-    @GetMapping("/kakao/logout")
-    public ResponseEntity<?> kakaoLogout(HttpSession session, HttpServletRequest request, HttpServletResponse response) {
+    @GetMapping("/kakao/sign-out")
+    public ResponseEntity<?> kakaoSignOut(HttpSession session, HttpServletRequest request, HttpServletResponse response) {
         String accessToken = (String) session.getAttribute("kakaoToken");
 
         if(accessToken != null && !"".equals(accessToken)){
@@ -123,9 +123,6 @@ public class OAuthController {
             System.out.println("accessToken is null");
         }
 
-        // 자체 토큰 지우기
-        String userLogId = request.getHeader(CommonUtil.USER_LOG_ID_NAME);
-        
         return ResponseEntity.ok().build();
     }
 }
