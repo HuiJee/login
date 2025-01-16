@@ -1,5 +1,6 @@
 package com.hjpj.login.entity;
 
+import com.hjpj.login.util.CommonUtil;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -52,7 +53,7 @@ public class User {
     private Boolean userStatus;
 
     @Column(name = "login_type")
-    private Integer loginType;
+    private String loginType;
 
     @PrePersist
     protected void onCreate() {
@@ -62,15 +63,15 @@ public class User {
         userUpdateDate = LocalDateTime.now();
     }
 
-    public User(String userLogId, String userLogPw, String name, String nickname) {
-        this.userLogId = userLogId;
-        this.userLogPw = userLogPw;
-        this.userName = name;
-        this.userNickname = nickname;
-        this.loginType = 0;
-    }
+//    public User(String userLogId, String userLogPw, String name, String nickname) {
+//        this.userLogId = userLogId;
+//        this.userLogPw = userLogPw;
+//        this.userName = name;
+//        this.userNickname = nickname;
+//        this.loginType = CommonUtil.GENERIC;
+//    }
 
-    public User(String userLogId, String userLogPw, String name, Integer loginType) {
+    public User(String userLogId, String userLogPw, String name, String loginType) {
         this.userLogId = userLogId;
         this.userLogPw = userLogPw;
         this.userName = name;

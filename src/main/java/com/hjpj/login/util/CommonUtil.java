@@ -10,8 +10,9 @@ public class CommonUtil {
     public static Integer INVALID_TOKEN_STATUS = 401;
     public static String ACCESS_TOKEN = "accessToken";
 
-    public static String KAKAO = "Kakao";
-    public static String NAVER = "Naver";
-    public static String GOOGLE = "Google";
+    public static String GENERIC = "GENERIC";
+    public static String KAKAO = "KAKAO";
+    public static String NAVER = "NAVER";
+    public static String GOOGLE = "GOOGLE";
 
 }

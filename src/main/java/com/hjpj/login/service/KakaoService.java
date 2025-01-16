@@ -162,6 +162,10 @@ public class KakaoService {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
 
+        // 자동 로그인을 하면 refresh 토큰이 1달이라고 함.. 그거에 따라 자동로그인 처리 필요!
+        System.out.println(jsonNode.get("refresh_token_expires_in"));
+        System.out.println(JwtUtil.REFRESH_TOKEN_VALIDITY);
+
         return jsonNode.get("access_token").asText();
     }
 
@@ -194,17 +198,17 @@ public class KakaoService {
 
     public UserDTO ifNeedKakaoInfo (KakaoInfo kakaoInfo, HttpServletResponse response) {
         System.out.println("카카오 회원 정보 확인");
-        String kakaoId = CommonUtil.KAKAO + "_" + kakaoInfo.getId();
-        Optional<UserDTO> kakaoMember = userRepository.findUserBySocialInfo(kakaoId, 2);
+        String kakaoId = kakaoInfo.getId();
+        Optional<UserDTO> kakaoMember = userRepository.findUserBySocialInfo(kakaoId, CommonUtil.KAKAO);
 
         // 회원가입
         if (kakaoMember.isEmpty()) {
             String tempPassword = passwordEncoder.encode(UUID.randomUUID().toString());
 
-            User newUser = new User(kakaoId, tempPassword, kakaoInfo.getNickname(), 2);
+            User newUser = new User(kakaoId, tempPassword, kakaoInfo.getNickname(), CommonUtil.KAKAO);
             userRepository.save(newUser);
 
-            kakaoMember = userRepository.findUserBySocialInfo(kakaoId, 2);
+            kakaoMember = userRepository.findUserBySocialInfo(kakaoId, CommonUtil.KAKAO);
         }
 
         makeAuthAndSaveToken(new UserLogDetail(kakaoMember.get()), response);
@@ -322,14 +326,15 @@ public class KakaoService {
     public void kakaoDisconnect(String accessToken) throws JsonProcessingException {
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + accessToken);
+        headers.add("Authorization", "KakaoAK " + clientId);
+//        headers.add("Authorization", "Bearer " + accessToken);
         headers.add("Content-type", "application/x-www-form-urlencoded");
 
         // HTTP 요청 보내기
         HttpEntity<MultiValueMap<String, String>> kakaoLogoutRequest = new HttpEntity<>(headers);
         RestTemplate rt = new RestTemplate();
         ResponseEntity<String> response = rt.exchange(
-                "https://kapi.kakao.com/v1/user/logout",
+                "https://kapi.kakao.com/v1/user/unlink",
                 HttpMethod.POST,
                 kakaoLogoutRequest,
                 String.class

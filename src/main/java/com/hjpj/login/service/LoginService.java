@@ -128,7 +128,6 @@ public class LoginService {
     /** 로그아웃 처리 */
     public void signOut(HttpServletRequest request, HttpServletResponse response) {
         String userLogId = request.getHeader(CommonUtil.USER_LOG_ID_NAME);
-        Integer loginType = userRepository.userLoginType(userLogId);
 
         redisRepository.deleteById(userLogId);
 

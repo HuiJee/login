@@ -15,6 +15,7 @@ public class UserDTO {
     private String userNickname;
     @Setter
     private String userRole;
+    private String loginType;
 
     public UserDTO(User user) {
         this.userId = user.getUserId();
@@ -22,5 +23,6 @@ public class UserDTO {
         this.userLogPw = user.getUserLogPw();
         this.userNickname = user.getUserNickname();
         this.userRole = user.getUserRole();
+        this.loginType = user.getLoginType();
     }
 }

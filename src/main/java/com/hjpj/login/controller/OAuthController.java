@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -41,7 +42,8 @@ public class OAuthController {
         System.out.println("카카오 코드 발급");
 //        kakaoService.getCodeFromKakao();
 //        System.out.println("code : " + code);
-        String location = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id="+kakaoClientId+"&redirect_uri="+kakaoRedirectUri;
+        // 연결 끊기 없이 로그아웃 시 재로그인을 돕고자... prompt = login 집어넣기
+        String location = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id="+kakaoClientId+"&redirect_uri="+kakaoRedirectUri+"&prompt=login";
         response.sendRedirect(location);
     }
 
@@ -111,13 +113,10 @@ public class OAuthController {
     public ResponseEntity<?> kakaoSignOut(HttpSession session, HttpServletRequest request, HttpServletResponse response) {
         String accessToken = (String) session.getAttribute("kakaoToken");
 
+        System.out.println("카카오 accessToken : " + accessToken);
+
         if(accessToken != null && !"".equals(accessToken)){
-            try {
-                loginService.signOut(request, response);
-                kakaoService.kakaoDisconnect(accessToken);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
+            loginService.signOut(request, response);
             session.removeAttribute("kakaoToken");
         }else{
             System.out.println("accessToken is null");
