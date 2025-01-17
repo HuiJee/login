@@ -41,6 +41,10 @@ public class KakaoService {
     private String clientSecret;
     @Value("${spring.security.oauth2.client.registration.kakao.authorization-grant-type}")
     private String authorizationGrantType;
+    @Value("${spring.security.oauth2.client.provider.kakao.token-uri}")
+    private String kakaoTokenUri;
+    @Value("${spring.security.oauth2.client.provider.user-info-uri}")
+    private String kakaoUserInfoUri;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -82,10 +86,10 @@ public class KakaoService {
     }
 
     public String getAccessToken(String code) throws JsonProcessingException {
-        String tokenResponse = WebClient.create("https://kauth.kakao.com").post()
+        String tokenResponse = WebClient.create(kakaoTokenUri).post()
                 .uri(uriBuilder -> uriBuilder
                         .scheme("https")
-                        .path("/oauth/token")
+                        .path("")
                         .queryParam("grant_type", authorizationGrantType)
                         .queryParam("client_id", clientId)
                         .queryParam("client_secret", clientSecret)
@@ -106,13 +110,8 @@ public class KakaoService {
 
     public KakaoInfoDTO getKakaoInfo(String accessToken) throws JsonProcessingException {
 
-        // HTTP Header 생성
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + accessToken);
-        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
-
-        String infoResponse = WebClient.create("https://kapi.kakao.com").post()
-                .uri("/v2/user/me")
+        String infoResponse = WebClient.create(kakaoUserInfoUri).post()
+                .uri("")
                 .header("Authorization", "Bearer " + accessToken)
                 .header("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
                 .retrieve()
