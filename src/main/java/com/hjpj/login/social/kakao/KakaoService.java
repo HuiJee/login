@@ -9,7 +9,9 @@ import com.hjpj.login.user.entity.User;
 import com.hjpj.login.user.repository.UserRepository;
 import com.hjpj.login.auth.service.TokenService;
 import com.hjpj.login.common.CommonUtil;
+import com.hjpj.login.user.service.LoginService;
 import io.netty.handler.codec.http.HttpHeaderValues;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -40,12 +42,10 @@ public class KakaoService {
     @Value("${spring.security.oauth2.client.registration.kakao.authorization-grant-type}")
     private String authorizationGrantType;
 
-    private final String KAUTH_TOKEN_URL_HOST = "https://kauth.kakao.com";
-    private final String KAUTH_USER_URL_HOST = "https://kapi.kakao.com";
-
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
+    private final LoginService loginService;
 
     /** 카카오 콜백 이후 메서드 통합 */
     public void callbackProcess(String code, HttpSession session, RedirectAttributes redirectAttributes, HttpServletResponse response) {
@@ -82,8 +82,7 @@ public class KakaoService {
     }
 
     public String getAccessToken(String code) throws JsonProcessingException {
-
-        String tokenResponse = WebClient.create(KAUTH_TOKEN_URL_HOST).post()
+        String tokenResponse = WebClient.create("https://kauth.kakao.com").post()
                 .uri(uriBuilder -> uriBuilder
                         .scheme("https")
                         .path("/oauth/token")
@@ -112,7 +111,7 @@ public class KakaoService {
         headers.add("Authorization", "Bearer " + accessToken);
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
-        String infoResponse = WebClient.create(KAUTH_USER_URL_HOST).post()
+        String infoResponse = WebClient.create("https://kapi.kakao.com").post()
                 .uri("/v2/user/me")
                 .header("Authorization", "Bearer " + accessToken)
                 .header("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
@@ -162,6 +161,18 @@ public class KakaoService {
 
         // 자체 토큰 생성 및 저장
         tokenService.makeTokenAndCookie(auth, userLogDetail, response);
+    }
+
+    public void kakaoSignOut(HttpSession session, HttpServletRequest request, HttpServletResponse response) {
+
+        String accessToken = (String) session.getAttribute("kakaoToken");
+
+        if(accessToken != null && !"".equals(accessToken)){
+            loginService.signOut(request, response);
+            session.removeAttribute("kakaoToken");
+        }else{
+            System.out.println("accessToken is null");
+        }
     }
 
 }

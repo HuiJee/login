@@ -48,17 +48,7 @@ public class KakaoController {
 
     @GetMapping("sign-out")
     public ResponseEntity<?> kakaoSignOut(HttpSession session, HttpServletRequest request, HttpServletResponse response) {
-        String accessToken = (String) session.getAttribute("kakaoToken");
-
-        System.out.println("카카오 accessToken : " + accessToken);
-
-        if(accessToken != null && !"".equals(accessToken)){
-            loginService.signOut(request, response);
-            session.removeAttribute("kakaoToken");
-        }else{
-            System.out.println("accessToken is null");
-        }
-
+        kakaoService.kakaoSignOut(session, request, response);
         return ResponseEntity.ok().build();
     }
 }
