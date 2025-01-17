@@ -1,6 +1,6 @@
 package com.hjpj.login.config;
 
-import com.hjpj.login.service.MailSettingService;
+import com.hjpj.login.email.sevice.MailSettingService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

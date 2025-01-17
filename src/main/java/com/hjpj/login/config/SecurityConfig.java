@@ -1,7 +1,7 @@
 package com.hjpj.login.config;
 
-import com.hjpj.login.jwt.JwtAuthenticationFilter;
-import com.hjpj.login.jwt.JwtProvider;
+import com.hjpj.login.auth.jwt.JwtAuthenticationFilter;
+import com.hjpj.login.auth.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
