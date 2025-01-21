@@ -74,6 +74,7 @@ async function tokenCheckFetch(url, options = {}) {
 
         if (refreshTokenResponse.ok) {
             console.log('refreshToken 존재!');
+
             // 리프레시 토큰으로 access 생성 후 다시 기능 시도
             response = await fetch(url, {
                 ...options,

@@ -1,5 +1,6 @@
 package com.hjpj.login.user.service;
 
+import com.hjpj.login.social.kakao.KakaoService;
 import com.hjpj.login.user.dto.LoginInfoDTO;
 import com.hjpj.login.user.dto.UserDTO;
 import com.hjpj.login.user.dto.UserLogDetail;
@@ -14,13 +15,17 @@ import com.hjpj.login.common.CommonUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
@@ -28,12 +33,16 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class LoginService {
+public class LoginService implements UserLogService{
+
+    @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
+    private String clientId;
 
     private final UserRepository userRepository;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final RedisRepository redisRepository;
+    private final KakaoService kakaoService;
 
     /** 로그인 처리 */
     public UserLogDetail authUserLogin(HttpServletRequest request, LoginInfoDTO logInfo, HttpServletResponse response) {
@@ -126,22 +135,58 @@ public class LoginService {
         return new String(Base64.getDecoder().decode(base64Credentials), StandardCharsets.UTF_8);
     }
 
-    /** 로그아웃 처리 */
-    public void signOut(HttpServletRequest request, HttpServletResponse response) {
-        String userLogId = request.getHeader(CommonUtil.USER_LOG_ID_NAME);
-
+    @Override
+    public void deleteTokenFromRedis(String userLogId) {
         redisRepository.deleteById(userLogId);
+    }
 
-        Cookie[] cookies = request.getCookies();
-        if(cookies != null) {
-            for(Cookie cookie : cookies) {
-                if(cookie.getName().equals(CommonUtil.ACCESS_TOKEN)) {
-                    cookie.setValue("");
-                    cookie.setPath("/");
-                    cookie.setMaxAge(0);
-                    response.addCookie(cookie);
-                }
-            }
+    /** 로그아웃 (자체 후 redirect) */
+    public Map<String, String> signOutAndRedirect(HttpSession session, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String loginType = request.getHeader("LoginType"); // 소셜 로그인 타입
+
+        // 공통 로그아웃 처리 (Redis 및 쿠키 삭제)
+        clearSessionAndCookies(request, response);
+
+        // 리다이렉트 URL 설정
+        String redirectUrl;
+        switch (loginType) {
+            case "KAKAO":
+                redirectUrl = "https://kauth.kakao.com/oauth/logout?client_id=" + clientId + "&logout_redirect_uri=http://localhost:8080/login/generic";
+                break;
+            case "GOOGLE":
+                redirectUrl = "추후 반영";
+                break;
+            case "NAVER":
+                redirectUrl = "추후 반영";
+                break;
+            default:
+                redirectUrl = "/login/generic";
+        }
+
+        // JSON 응답 생성
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("redirectUrl", redirectUrl);
+
+        return responseBody;
+    }
+
+    /** 단순 로그아웃 (내부적으로 다 처리) */
+    public void signOut(HttpSession session, HttpServletRequest request, HttpServletResponse response) {
+        String loginType = request.getHeader("LoginType"); // 소셜 로그인 타입
+
+        // 공통 로그아웃 처리 (Redis 및 쿠키 삭제)
+        clearSessionAndCookies(request, response);
+
+        switch (loginType) {
+            case "KAKAO":
+                kakaoService.signOut(session, request, response);
+                break;
+            case "GOOGLE":
+                break;
+            case "NAVER":
+                break;
+            default:
+                break;
         }
     }
 

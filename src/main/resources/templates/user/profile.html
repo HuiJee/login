@@ -79,31 +79,6 @@
     </div>
 </div>
 
-<!--<div class="modal align-content-center" tabindex="-1" id="selectLogoutTypeModal">-->
-<!--    <div class="modal-dialog">-->
-<!--        <div class="modal-content">-->
-<!--            <div class="modal-header">-->
-<!--                <h5 class="modal-title fs-5 text-danger">-->
-<!--                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-question-circle" viewBox="0 0 16 16">-->
-<!--                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>-->
-<!--                        <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286m1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94"/>-->
-<!--                    </svg>-->
-<!--                    Confirm-->
-<!--                </h5>-->
-<!--            </div>-->
-<!--            <div class="modal-body col-xl-12">-->
-<!--                <p>로그아웃 하시겠습니까?</p>-->
-<!--                <p class="small text-danger">(연결해제를 하지 않는 경우,-->
-<!--                    <br>소셜 로그인 시 기존 계정이 남아있을 수 있습니다.)</p>-->
-<!--            </div>-->
-<!--            <div class="modal-footer">-->
-<!--                <button type="button" class="btn btn-outline-danger light all-logout-btn" data-bs-dismiss="modal">로그아웃 및 연결해제</button>-->
-<!--                <button type="button" class="btn btn-outline-danger light only-logout-btn" data-bs-dismiss="modal">로그아웃</button>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--</div>-->
-
 <div class="social-user" th:if="${user != null}">
     <input type="hidden" id="social_user_id" th:value="${user.userId}">
     <input type="hidden" id="social_user_log_id" th:value="${user.userLogId}">
@@ -140,7 +115,6 @@
     const _userRole = document.querySelector('#user-role'); // 권한 보여주는 input
 
     const confLogoutModal = document.querySelector('#confLogoutModal'); // 로그아웃 확인 모달
-    // const selectLogoutTypeModal = document.querySelector('#selectLogoutTypeModal'); // 소셜 로그인 시 로그아웃 타입 선택
 
     /** 회원 정보 찾아와 보여주기 */
     function getUserInfo() {
@@ -164,59 +138,67 @@
 
         /** 로그아웃 버튼 클릭 */
     document.querySelector('.logout-btn').addEventListener('click', () => {
-        // if(LOGIN_TYPE !== GENERIC) {
-        //     selectLogoutTypeModal.style.display = 'block';
-        // } else {
-        //     confLogoutModal.style.display = 'block';
-        // }
-
         confLogoutModal.style.display = 'block';
     });
 
         /** 로그아웃 conf모달 확인 버튼 클릭 */
-    document.querySelectorAll('.ok-logout-btn, .only-logout-btn, .all-logout-btn').forEach(button => {
-        button.addEventListener('click', () => {
+    document.querySelector('.ok-logout-btn').addEventListener('click', () => {
+        confLogoutModal.style.display = 'none';
 
-            // if(button.classList.contains('ok-logout-btn')) {
-            //     confLogoutModal.style.display = 'none';
-            // } else {
-            //     selectLogoutTypeModal.style.display = 'none';
-            //     outAllInfo = true;
-            // }
+        // 계정과 함께 로그아웃 (자체 로그아웃 후 소셜 로그아웃)
+        logoutAndRedirect();
 
-            confLogoutModal.style.display = 'none';
-            // 로그아웃 처리(토큰 모두 만료)
-            logout();
-        });
+        // 그냥 로그아웃 (한 번에 진행)
+        // logout();
     });
 
+    /** 그냥 로그아웃 */
     function logout() {
-        let logoutUrl = '';
-
-        if (LOGIN_TYPE === KAKAO) {
-            console.log("카카오 로그아웃");
-            logoutUrl = `/oauth/kakao/sign-out`;
-        } else if (LOGIN_TYPE === NAVER) {
-            console.log("네이버 로그아웃");
-            logoutUrl = `/oauth/naver/sign-out`;
-        } else if (LOGIN_TYPE === GOOGLE) {
-            console.log("구글 로그아웃");
-            logoutUrl = `/oauth/google/sign-out`;
-        } else {
-            console.log("일반 로그아웃");
-            logoutUrl = "/api/login/sign-out";
-        }
-
-        tokenCheckFetch(logoutUrl, {
+        tokenCheckFetch("/api/login/sign-out", {
             headers: {
-                'UserLogId': USER_LOG_ID
+                'UserLogId': USER_LOG_ID,
+                'LoginType' : LOGIN_TYPE
             }
         })
         .then(response => {
             if (response.ok) {
-                console.log('로그 아웃 처리 완료(로직)');
                 goLoginAgain();
+            } else {
+                throw new Error('로그아웃 요청 실패');
             }
+        })
+        .catch(error => {
+            console.error('로그아웃 처리 중 오류:', error);
+        });
+    }
+
+    /** 계정과 함께 로그아웃 (자체 후 소셜 진행)*/
+    function logoutAndRedirect() {
+        tokenCheckFetch("/api/login/sign-out/redirect", {
+            headers: {
+                'UserLogId': USER_LOG_ID,
+                'LoginType' : LOGIN_TYPE
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json(); // JSON 응답을 파싱
+            } else {
+                throw new Error('로그아웃 요청 실패');
+            }
+        })
+        .then(data => {
+            console.log('로그아웃 성공:', data);
+            localStorageDel();
+
+            if (data.redirectUrl) {
+                location.href = data.redirectUrl;
+            } else {
+                console.warn('리다이렉트 URL이 제공되지 않았습니다.');
+            }
+        })
+        .catch(error => {
+            console.error('로그아웃 처리 중 오류:', error);
         });
     }
 

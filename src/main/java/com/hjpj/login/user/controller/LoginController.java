@@ -6,11 +6,13 @@ import com.hjpj.login.user.service.LoginService;
 import com.hjpj.login.common.CommonUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 
@@ -49,10 +51,17 @@ public class LoginController {
 
     /** 로그아웃 진행 */
     @Transactional
+    @GetMapping("sign-out/redirect")
+    public ResponseEntity<?> signOutAndRedirect(HttpSession session, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Map<String, String> redirectUrl = loginService.signOutAndRedirect(session, request, response);
+        return ResponseEntity.ok(redirectUrl);
+    }
+
+    @Transactional
     @GetMapping("sign-out")
-    public ResponseEntity<?> signOut(HttpServletRequest request, HttpServletResponse response) {
-        loginService.signOut(request, response);
-        return ResponseEntity.ok("로그아웃 처리가 되었습니다.");
+    public ResponseEntity<?> signOut(HttpSession session, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        loginService.signOut(session, request, response);
+        return ResponseEntity.ok("로그아웃 완료!");
     }
 
 }

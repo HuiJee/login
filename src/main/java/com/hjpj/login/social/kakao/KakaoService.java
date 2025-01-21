@@ -3,14 +3,13 @@ package com.hjpj.login.social.kakao;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hjpj.login.social.SocialLogService;
 import com.hjpj.login.user.dto.UserDTO;
 import com.hjpj.login.user.dto.UserLogDetail;
 import com.hjpj.login.user.entity.User;
 import com.hjpj.login.user.repository.UserRepository;
 import com.hjpj.login.auth.service.TokenService;
 import com.hjpj.login.common.CommonUtil;
-import com.hjpj.login.user.service.LoginService;
-import io.netty.handler.codec.http.HttpHeaderValues;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -18,9 +17,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -33,7 +29,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class KakaoService {
+public class KakaoService implements SocialLogService {
 
     @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String clientId;
@@ -43,13 +39,17 @@ public class KakaoService {
     private String authorizationGrantType;
     @Value("${spring.security.oauth2.client.provider.kakao.token-uri}")
     private String kakaoTokenUri;
-    @Value("${spring.security.oauth2.client.provider.user-info-uri}")
+    @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
     private String kakaoUserInfoUri;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
-    private final LoginService loginService;
+
+    @Override
+    public TokenService getTokenService() {
+        return tokenService;
+    }
 
     /** 카카오 콜백 이후 메서드 통합 */
     public void callbackProcess(String code, HttpSession session, RedirectAttributes redirectAttributes, HttpServletResponse response) {
@@ -78,11 +78,6 @@ public class KakaoService {
             redirectAttributes.addFlashAttribute("user", kakaoMember);
             redirectAttributes.addFlashAttribute("social", CommonUtil.KAKAO);
         }
-
-        // 짧은 데이터 전달 : url에 parameter로 넣어서
-        // 로그인 반복 정보 전달 :  session에 담아서 타임리프로 session.이름
-        // 임시 데이터 전달 : Flash Attributes 사용하기
-        // redirect의 경우 model로 전달하면 데이터가 넘어가지 않는다!!
     }
 
     public String getAccessToken(String code) throws JsonProcessingException {
@@ -95,7 +90,7 @@ public class KakaoService {
                         .queryParam("client_secret", clientSecret)
                         .queryParam("code", code)
                         .build(true))
-                .header(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED.toString())
+                .header("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.error(new RuntimeException("Invalid Parameter")))
                 .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.error(new RuntimeException("Internal Server Error")))
@@ -132,7 +127,6 @@ public class KakaoService {
     }
 
     public UserDTO ifNeedKakaoInfo (KakaoInfoDTO kakaoInfo, HttpServletResponse response) {
-        System.out.println("카카오 회원 정보 확인");
         String kakaoId = kakaoInfo.getId();
         Optional<UserDTO> kakaoMember = userRepository.findUserBySocialInfo(kakaoId, CommonUtil.KAKAO);
 
@@ -151,24 +145,31 @@ public class KakaoService {
         return kakaoMember.get();
     }
 
-    private void makeAuthAndSaveToken(UserLogDetail userLogDetail, HttpServletResponse response) {
-        // 인증 정보 만들기
-        Authentication auth = new UsernamePasswordAuthenticationToken(userLogDetail, userLogDetail.getUserLogId(), userLogDetail.getAuthorities());
-
-        // SecurityContext에 설정
-        SecurityContextHolder.getContext().setAuthentication(auth);
-
-        // 자체 토큰 생성 및 저장
-        tokenService.makeTokenAndCookie(auth, userLogDetail, response);
-    }
-
-    public void kakaoSignOut(HttpSession session, HttpServletRequest request, HttpServletResponse response) {
+    @Override
+    public void signOut(HttpSession session, HttpServletRequest request, HttpServletResponse response) {
 
         String accessToken = (String) session.getAttribute("kakaoToken");
+        String userLogId = request.getHeader(CommonUtil.USER_LOG_ID_NAME);
 
         if(accessToken != null && !"".equals(accessToken)){
-            loginService.signOut(request, response);
-            session.removeAttribute("kakaoToken");
+            String logoutId = WebClient.create("https://kapi.kakao.com/v1/user/logout").post()
+                    .uri(uriBuilder -> uriBuilder
+                            .scheme("https")
+                            .path("")
+                            .queryParam("target_id_type", "user_id")
+                            .queryParam("target_id", userLogId)
+                            .build(true))
+                    .header("Authorization", "Bearer " + accessToken)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.error(new RuntimeException("Invalid Parameter")))
+                    .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.error(new RuntimeException("Internal Server Error")))
+                    .bodyToMono(String.class)
+                    .block();
+
+            if(userLogId.equals(logoutId)){
+                session.removeAttribute("kakaoToken");
+            }
+
         }else{
             System.out.println("accessToken is null");
         }

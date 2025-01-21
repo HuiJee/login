@@ -41,11 +41,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 인증 예외 경로가 아닌 경우 access 토큰 확인
         String accessToken = jwtProvider.getTokenFromCookie(request);
-        System.out.println("accessToken: " + accessToken);
         if(accessToken == null) {
             System.out.println("AccessToken 존재하지 않음");
             // AccessToken 발급을 위해 401 전송
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Missing access token");
+            return;
         }
 
         // StringUtils.hasText : NULL 이거나 "" 이거나 공백만 포함하고 있으면 false 반환
@@ -57,6 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if(!Objects.equals(userLogIdFromToken, userLogId)) {
                 System.out.println("토큰 ID : " + userLogIdFromToken + " / 헤더 ID : " + userLogId + " => 불일치!");
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Not matching token info");
+                return;
             }
 
             Authentication authentication = jwtProvider.getAuthentication(accessToken);
@@ -75,10 +76,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return requestURI.equals("/index") ||
                 requestURI.equals("/") ||
                 requestURI.equals("/login/generic") ||          // 일반 로그인 페이지
-                requestURI.equals("/login/social") ||           // 소셜 로그인 페이지
                 requestURI.startsWith("/api/login/") ||        // 로그인 검증, 자동 로그인, 로그아웃
                 requestURI.startsWith("/login/find/") ||        // 정보 찾기 페이지
-                requestURI.startsWith("/social/") ||
                 requestURI.startsWith("/oauth/") ||
                 requestURI.equals("/user/profile") ||           // 프로필(로그인 결과 창)
                 requestURI.equals("/user/register") ||           // 회원 가입 창
@@ -89,8 +88,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 requestURI.contains("/bootstrap/") ||
                 requestURI.contains("/fonts/") ||
                 requestURI.contains("/images/") ||
-                requestURI.contains("/icons/") ||
-                requestURI.contains("/favicon.ico");
+                requestURI.contains("/icons/") ;
+//                requestURI.contains("/favicon.ico");
     }
 
 }
