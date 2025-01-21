@@ -27,6 +27,7 @@ Open JDK 17, Spring Boot, Spring Data JPA, Spring Security, JWT, MySQL 8.0.36, R
 ### 2. LoginController
 - 로그인 <code>POST /api/login/auth-user</code>
 - 로그아웃 <code>GET /api/login/sign-out</code>
+- 로그아웃(카카오 세션 종료 포함) <code>GET /api/login/sign-out/redirect</code>
 - 자동로그인 <code>GET /api/login/auto-login</code>
 - ID/PW 찾기 <code>POST /api/login/find/{findTarget}</code>
 
@@ -41,7 +42,6 @@ Open JDK 17, Spring Boot, Spring Data JPA, Spring Security, JWT, MySQL 8.0.36, R
 ### 5. OAuthController
 - 카카오 코드 발급 <code>GET /oauth/kakao/code</code>
 - 카카오 콜백 (토큰 및 정보 받기) <code>GET /oauth/kakao/callback</code>
-- 카카오 로그아웃 <code>GET /oauth/kakao/logout</code>
 --- 다른 소셜 로그인 작업 예정 ---
 
 <br>
@@ -167,7 +167,7 @@ LocalStorage에 있는 [기억하기]를 제외한 모든 정보를 삭제 후 �
 <br>
 <br>
 
-## 7. 소셜 로그인(Kakao)
+## 7. Kakao 
 ![localhost_8080_login_generic (5)](https://github.com/user-attachments/assets/0647c0e9-8316-4b12-9bac-3486145625b5)
 
 - 로그인 페이지 내에서 해당 버튼을 생성
@@ -176,12 +176,31 @@ LocalStorage에 있는 [기억하기]를 제외한 모든 정보를 삭제 후 �
 - 카카오 api를 통해 작업을 진행
 - 클릭 시, 다른 사이트에서 보던 카카오 로그인 화면으로 이동
 
-![image](https://github.com/user-attachments/assets/3a9f6ec3-3193-4912-8fbd-719a91e8f94c)
-- 로그인 시, 카카오 자체에서 부여하는 id 번호에 "Kakao"를 붙여 구분
+![image](https://github.com/user-attachments/assets/255e6527-9a13-4dff-a99f-415ad72950c6)
+- 카카오 자체에서 부여하는 식별번호를 웹사이트 ID로 저장했으나, 노출하지 않기 위해 LoginType에 맞춰 회원 표시
 - 콜백 절차를 통합하여, 코드 발급, 토큰 발급, 카카오 정보 발급을 진행
 - 회원 존재하는 경우 바로 로그인 처리 / 존재하지 않는 경우 INSERT 후 로그인 처리
   (회원가입 절차 진행 완성 시, 비회원은 해당 페이지로 이동할 예정)
 - 자체 토큰을 별도로 발급하여 세션 유지 등의 기능을 실행
-  
+
+<br>
+👉 단순 로그아웃
+카카오에서 기본적으로 제공하는 단순 로그아웃 api는 요청 파라미터에 admin key를 넣지 않으면, accessToken은 만료하지만 재 로그인 시 기존 계정으로 자동 로그인 됨.
+
+https://github.com/user-attachments/assets/a1f52216-4c37-4ee4-9141-1c8de682d136
+
+로그인 자체 파라미터에 prompt를 추가 설정하여 기존 계정이 아닌, 새로운 로그인 입력창이 나오게 할 수는 있다.
+
+
+<br>
+👉 카카오 계정 로그아웃
+하지만 계정까지 로그아웃하는 api를 사용하면 로그아웃 시 로그아웃 방식을 선택할 수 있다.
+
+https://github.com/user-attachments/assets/14b87f64-c23c-4f44-8d07-6b1a3cf84ac0
+
+첫 번째 방식은 [단순 로그아웃]과 동일하나,
+두 번 째 방식은 계정 자체 로그아웃이므로 재 로그인을 시도할 경우 로그인 창이 나오게 된다.
+
+
 
 
