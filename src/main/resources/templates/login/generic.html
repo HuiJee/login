@@ -55,7 +55,6 @@
                                         <p>정보를 모두 입력 후 시도하세요.</p>
                                     </div>
                                     <div class="new-account mt-5 d-flex align-items-center justify-content-between flex-wrap">
-<!--                                        <small class="mb-0"><a th:href="@{/login/social}">소셜 로그인</a></small>-->
                                         <a class="kakao-login">
                                             <img th:src="@{/images/kakao_login_small.png}"/>
                                         </a>
@@ -86,12 +85,12 @@
         }
 
         // 세션만 닫은 경우 기존 회원 리프레시 존재 여부 찾아서 로그인 시키기
-        if(USER_ID !== null && USER_LOG_ID !==null) {
+        else if(USER_ID !== null && USER_LOG_ID !==null) {
             existsPrevRefresh();
         }
 
         /** 아이디 기억하기의 경우 마지막 로그인한 ID 보여주기 */
-        if(SAVED_USER_LOG_ID !== null) {
+        else if(SAVED_USER_LOG_ID !== null) {
             _userLogId.classList.add('border-primary');
             _userLogId.value = SAVED_USER_LOG_ID;
         }

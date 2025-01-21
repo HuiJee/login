@@ -1,7 +1,7 @@
 package com.hjpj.login.config;
 
-import com.hjpj.login.jwt.JwtAuthenticationFilter;
-import com.hjpj.login.jwt.JwtProvider;
+import com.hjpj.login.auth.jwt.JwtAuthenticationFilter;
+import com.hjpj.login.auth.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -46,7 +46,7 @@ public class SecurityConfig {
                 // 접근 권한 설정
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/static/**", "/public/**", "/resources/static/**", "/META-INF/resources/**",
-                                "/css/**", "/js/**", "/bootstrap/**", "/images/**", "/icons/**", "/favicon.ico", "/fonts/**").permitAll()
+                                "/css/**", "/js/**", "/bootstrap/**", "/images/**", "/icons/**", "/fonts/**").permitAll()
                         .requestMatchers("/login/**", "/user/**", "/api/**", "/social/**", "/oauth/**").permitAll()
                         .anyRequest().authenticated()
                 )

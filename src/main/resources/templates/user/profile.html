@@ -89,11 +89,10 @@
 
 <script th:inline="javascript">
 
-    // let USER_ID, USER_LOG_ID, LOGIN_TYPE;
-
     document.addEventListener('DOMContentLoaded', () => {
         const socialUser = document.querySelector('.social-user');
         if(socialUser) {
+            window.localStorage.clear();
             socialInfoSet();
         }
         getUserInfo();
@@ -132,7 +131,7 @@
 
         /** 가져온 회원 정보 보여주기 */
     function setUserInfo(user) {
-        _userLogId.value = user.userLogId;
+        _userLogId.value = LOGIN_TYPE === GENERIC ? user.userLogId : user.loginType + ' 회원';
         _userNickname.value = user.userNickname;
         _userRole.value = user.userRole;
     }
@@ -144,43 +143,62 @@
 
         /** 로그아웃 conf모달 확인 버튼 클릭 */
     document.querySelector('.ok-logout-btn').addEventListener('click', () => {
-        // 모달 닫기
-        confLogoutModal.style.display = 'block';
+        confLogoutModal.style.display = 'none';
 
-        // 로그아웃 처리(토큰 모두 만료)
-        logout();
+        // 계정과 함께 로그아웃 (자체 로그아웃 후 소셜 로그아웃)
+        logoutAndRedirect();
+
+        // 그냥 로그아웃 (한 번에 진행)
+        // logout();
     });
 
+    /** 그냥 로그아웃 */
     function logout() {
-        let logoutUrl;
-
-        switch(LOGIN_TYPE) {
-            case KAKAO:
-                console.log("카카오 로그아웃");
-                logoutUrl = "/oauth/kakao/sign-out";
-                break;
-            case NAVER:
-                console.log("네이버 로그아웃");
-                break;
-            case GOOGLE:
-                console.log("구글 로그아웃");
-                break;
-            default:
-                console.log("일반 로그아웃");
-                logoutUrl = "/api/login/sign-out";
-                break;
-        }
-
-        tokenCheckFetch(logoutUrl, {
+        tokenCheckFetch("/api/login/sign-out", {
             headers: {
-                'UserLogId': USER_LOG_ID
+                'UserLogId': USER_LOG_ID,
+                'LoginType' : LOGIN_TYPE
             }
         })
         .then(response => {
             if (response.ok) {
-                console.log('로그 아웃 처리 완료(로직)');
                 goLoginAgain();
+            } else {
+                throw new Error('로그아웃 요청 실패');
             }
+        })
+        .catch(error => {
+            console.error('로그아웃 처리 중 오류:', error);
+        });
+    }
+
+    /** 계정과 함께 로그아웃 (자체 후 소셜 진행)*/
+    function logoutAndRedirect() {
+        tokenCheckFetch("/api/login/sign-out/redirect", {
+            headers: {
+                'UserLogId': USER_LOG_ID,
+                'LoginType' : LOGIN_TYPE
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json(); // JSON 응답을 파싱
+            } else {
+                throw new Error('로그아웃 요청 실패');
+            }
+        })
+        .then(data => {
+            console.log('로그아웃 성공:', data);
+            localStorageDel();
+
+            if (data.redirectUrl) {
+                location.href = data.redirectUrl;
+            } else {
+                console.warn('리다이렉트 URL이 제공되지 않았습니다.');
+            }
+        })
+        .catch(error => {
+            console.error('로그아웃 처리 중 오류:', error);
         });
     }
 
