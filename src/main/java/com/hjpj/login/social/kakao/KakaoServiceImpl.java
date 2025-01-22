@@ -3,12 +3,12 @@ package com.hjpj.login.social.kakao;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hjpj.login.social.SocialLogService;
+import com.hjpj.login.social.SocialService;
+import com.hjpj.login.social.SocialUtils;
 import com.hjpj.login.user.dto.UserDTO;
 import com.hjpj.login.user.dto.UserLogDetail;
 import com.hjpj.login.user.entity.User;
 import com.hjpj.login.user.repository.UserRepository;
-import com.hjpj.login.auth.service.TokenService;
 import com.hjpj.login.common.CommonUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -29,7 +29,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class KakaoService implements SocialLogService {
+public class KakaoServiceImpl implements SocialService {
 
     @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String clientId;
@@ -44,20 +44,15 @@ public class KakaoService implements SocialLogService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final TokenService tokenService;
-
-    @Override
-    public TokenService getTokenService() {
-        return tokenService;
-    }
 
     /** 카카오 콜백 이후 메서드 통합 */
+    @Override
     public void callbackProcess(String code, HttpSession session, RedirectAttributes redirectAttributes, HttpServletResponse response) {
 
         // 코드 기반으로 토큰 발급
         String kakaoAccessToken = null;
         try {
-            kakaoAccessToken = this.getAccessToken(code);
+            kakaoAccessToken = SocialUtils.getAccessToken(kakaoTokenUri, clientId, clientSecret, code);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -78,29 +73,6 @@ public class KakaoService implements SocialLogService {
             redirectAttributes.addFlashAttribute("user", kakaoMember);
             redirectAttributes.addFlashAttribute("social", CommonUtil.KAKAO);
         }
-    }
-
-    public String getAccessToken(String code) throws JsonProcessingException {
-        String tokenResponse = WebClient.create(kakaoTokenUri).post()
-                .uri(uriBuilder -> uriBuilder
-                        .scheme("https")
-                        .path("")
-                        .queryParam("grant_type", authorizationGrantType)
-                        .queryParam("client_id", clientId)
-                        .queryParam("client_secret", clientSecret)
-                        .queryParam("code", code)
-                        .build(true))
-                .header("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.error(new RuntimeException("Invalid Parameter")))
-                .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.error(new RuntimeException("Internal Server Error")))
-                .bodyToMono(String.class)
-                .block();
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(tokenResponse);
-
-        return jsonNode.get("access_token").asText();
     }
 
     public KakaoInfoDTO getKakaoInfo(String accessToken) throws JsonProcessingException {
@@ -140,7 +112,7 @@ public class KakaoService implements SocialLogService {
             kakaoMember = userRepository.findUserBySocialInfo(kakaoId, CommonUtil.KAKAO);
         }
 
-        makeAuthAndSaveToken(new UserLogDetail(kakaoMember.get()), response);
+        SocialUtils.makeAuthAndSaveToken(new UserLogDetail(kakaoMember.get()), response);
 
         return kakaoMember.get();
     }

@@ -2,7 +2,7 @@ package com.hjpj.login.user.controller;
 
 import com.hjpj.login.user.dto.LoginInfoDTO;
 import com.hjpj.login.user.entity.User;
-import com.hjpj.login.user.service.LoginService;
+import com.hjpj.login.user.service.LoginServiceImpl;
 import com.hjpj.login.common.CommonUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,7 +21,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class LoginController {
 
-    private final LoginService loginService;
+    private final LoginServiceImpl loginService;
 
     /** 아이디 또는 pw 찾기 */
     @PostMapping("find/{findTarget}")
@@ -52,8 +52,8 @@ public class LoginController {
     /** 로그아웃 진행 */
     @Transactional
     @GetMapping("sign-out/redirect")
-    public ResponseEntity<?> signOutAndRedirect(HttpSession session, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Map<String, String> redirectUrl = loginService.signOutAndRedirect(session, request, response);
+    public ResponseEntity<?> signOutAndRedirect(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Map<String, String> redirectUrl = loginService.signOutAndRedirect(request, response);
         return ResponseEntity.ok(redirectUrl);
     }
 
