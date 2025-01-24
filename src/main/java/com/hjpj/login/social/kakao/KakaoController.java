@@ -16,14 +16,12 @@ import java.io.IOException;
 @RequestMapping("/oauth/kakao/")
 public class KakaoController {
 
-    @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
-    private String kakaoClientId;
-
-    @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
-    private String kakaoRedirectUri;
-
-    @Value("${spring.security.oauth2.client.provider.kakao.authorization-uri}")
-    private String kakaoAuthorizationUri;
+    @Value("${spring.social.oauth.kakao.client-id}")
+    private String clientId;
+    @Value("${spring.social.oauth.kakao.redirect-uri}")
+    private String redirectUri;
+    @Value("${spring.social.oauth.kakao.authorization-uri}")
+    private String authorizationUri;
 
     private final KakaoServiceImpl kakaoService;
 
@@ -31,9 +29,9 @@ public class KakaoController {
     @GetMapping("code")
     public void getKakaoCode(HttpServletResponse response) throws IOException {
         // 계정과 함께 로그아웃인 경우
-        String location = kakaoAuthorizationUri + "?response_type=code&client_id="+kakaoClientId+"&redirect_uri="+kakaoRedirectUri;
+        String location = authorizationUri + "?response_type=code&client_id="+clientId+"&redirect_uri="+redirectUri;
         // 그냥 로그아웃인 경우 로그인 재입력창 나오도록
-        // String location = kakaoAuthorizationUri + "?response_type=code&client_id="+kakaoClientId+"&redirect_uri="+kakaoRedirectUri+"&prompt=login";
+        // String location = authorizationUri + "?response_type=code&client_id="+clientId+"&redirect_uri="+redirectUri+"&prompt=login";
         response.sendRedirect(location);
     }
 

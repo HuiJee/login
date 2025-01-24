@@ -1,7 +1,7 @@
 package com.hjpj.login.auth.jwt;
 
 import com.hjpj.login.user.dto.UserLogDetail;
-import com.hjpj.login.common.CommonUtil;
+import com.hjpj.login.common.CommonUtils;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -36,12 +36,12 @@ public class JwtProvider {
         Claims claims = parseClaims(token);
 
         // 권한 존재 여부 판단
-        if (claims.get(CommonUtil.AUTH_NAME) == null) {
+        if (claims.get(CommonUtils.AUTH_NAME) == null) {
             throw new RuntimeException("권한 정보가 존재하지 않습니다.");
         }
 
         // 권한 정보 가져오기(Collection 형태)
-        Collection<? extends GrantedAuthority> authorities = Arrays.stream(claims.get(CommonUtil.AUTH_NAME).toString().split(","))
+        Collection<? extends GrantedAuthority> authorities = Arrays.stream(claims.get(CommonUtils.AUTH_NAME).toString().split(","))
                 .map(SimpleGrantedAuthority::new)
                 .toList();
 
@@ -83,7 +83,7 @@ public class JwtProvider {
     public String getTokenFromCookie(HttpServletRequest request) {
         if(request.getCookies() != null) {
             for(Cookie cookie : request.getCookies()) {
-                if(cookie.getName().equals(CommonUtil.ACCESS_TOKEN)) {
+                if(cookie.getName().equals(CommonUtils.ACCESS_TOKEN)) {
                     return cookie.getValue();
                 }
             }

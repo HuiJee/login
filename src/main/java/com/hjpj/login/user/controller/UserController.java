@@ -1,6 +1,6 @@
 package com.hjpj.login.user.controller;
 
-import com.hjpj.login.auth.service.TokenService;
+import com.hjpj.login.auth.TokenService;
 import com.hjpj.login.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -1,5 +1,7 @@
 package com.hjpj.login.user.service;
 
+import com.hjpj.login.auth.TokenUtils;
+import com.hjpj.login.common.CommonUtils;
 import com.hjpj.login.social.kakao.KakaoServiceImpl;
 import com.hjpj.login.user.dto.LoginInfoDTO;
 import com.hjpj.login.user.dto.UserDTO;
@@ -7,10 +9,8 @@ import com.hjpj.login.user.dto.UserLogDetail;
 import com.hjpj.login.user.entity.User;
 import com.hjpj.login.exception.CustomException;
 import com.hjpj.login.exception.ErrorCode;
-import com.hjpj.login.auth.jwt.JwtUtil;
 import com.hjpj.login.redis.RedisRepository;
 import com.hjpj.login.user.repository.UserRepository;
-import com.hjpj.login.auth.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -22,8 +22,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,11 +29,12 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class LoginServiceImpl implements LoginService {
 
-    @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
-    private String clientId;
+    @Value("${spring.social.oauth.kakao.client-id}")
+    private String kakaoClientId;
+    @Value("${spring.social.oauth.kakao.oauth-logout-uri}")
+    private String kakaoOauthLogoutUri;
 
     private final UserRepository userRepository;
-    private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final RedisRepository redisRepository;
     private final KakaoServiceImpl kakaoService;
@@ -62,7 +61,7 @@ public class LoginServiceImpl implements LoginService {
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         // 토큰 및 쿠키 생성 후 access만 전달받기
-        tokenService.makeTokenAndCookie(auth, userLogDetail,response);
+        TokenUtils.makeTokenAndCookie(auth, userLogDetail,response);
 
         System.out.println(passwordEncoder.matches(logInfo.getUserLogPw(), userLogDetail.getUserLogPw()));
 
@@ -115,7 +114,7 @@ public class LoginServiceImpl implements LoginService {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         // 토큰 찾아서 작업하기 (문제 있는 경우 throw 됨)
-        tokenService.getAccessFromRefresh(user.getUserLogId(), response);
+        TokenUtils.getAccessFromRefresh(user.getUserLogId(), response);
 
         return user;
     }
@@ -127,7 +126,7 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public Map<String, String> signOutAndRedirect(HttpServletRequest request, HttpServletResponse response){
-        String loginType = request.getHeader("LoginType"); // 소셜 로그인 타입
+        String loginType = request.getHeader(CommonUtils.LOGIN_TYPE); // 소셜 로그인 타입
 
         // 공통 로그아웃 처리 (Redis 및 쿠키 삭제)
         clearSessionAndCookies(request, response);
@@ -136,7 +135,7 @@ public class LoginServiceImpl implements LoginService {
         String redirectUrl;
         switch (loginType) {
             case "KAKAO":
-                redirectUrl = "https://kauth.kakao.com/oauth/logout?client_id=" + clientId + "&logout_redirect_uri=http://localhost:8080/login/generic";
+                redirectUrl = kakaoOauthLogoutUri + "?client_id=" + kakaoClientId + "&logout_redirect_uri=http://localhost:8080/login/generic";
                 break;
             case "GOOGLE":
                 redirectUrl = "추후 반영";
@@ -157,7 +156,7 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public void signOut(HttpSession session, HttpServletRequest request, HttpServletResponse response) {
-        String loginType = request.getHeader("LoginType"); // 소셜 로그인 타입
+        String loginType = request.getHeader(CommonUtils.LOGIN_TYPE); // 소셜 로그인 타입
 
         // 공통 로그아웃 처리 (Redis 및 쿠키 삭제)
         clearSessionAndCookies(request, response);

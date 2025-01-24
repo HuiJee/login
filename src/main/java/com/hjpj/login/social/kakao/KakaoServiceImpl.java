@@ -9,7 +9,7 @@ import com.hjpj.login.user.dto.UserDTO;
 import com.hjpj.login.user.dto.UserLogDetail;
 import com.hjpj.login.user.entity.User;
 import com.hjpj.login.user.repository.UserRepository;
-import com.hjpj.login.common.CommonUtil;
+import com.hjpj.login.common.CommonUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -31,16 +31,18 @@ import java.util.UUID;
 @Slf4j
 public class KakaoServiceImpl implements SocialService {
 
-    @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
+    @Value("${spring.social.oauth.common.content-type.form-urlencoded}")
+    private String contentTypeUrlEncoded;
+    @Value("${spring.social.oauth.kakao.client-id}")
     private String clientId;
-    @Value("${spring.security.oauth2.client.registration.kakao.client-secret}")
+    @Value("${spring.social.oauth.kakao.client-secret}")
     private String clientSecret;
-    @Value("${spring.security.oauth2.client.registration.kakao.authorization-grant-type}")
-    private String authorizationGrantType;
-    @Value("${spring.security.oauth2.client.provider.kakao.token-uri}")
+    @Value("${spring.social.oauth.kakao.token-uri}")
     private String kakaoTokenUri;
-    @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
+    @Value("${spring.social.oauth.kakao.user-info-uri}")
     private String kakaoUserInfoUri;
+    @Value("${spring.social.oauth.kakao.signout-uri}")
+    private String kakaoSignoutUri;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -69,9 +71,9 @@ public class KakaoServiceImpl implements SocialService {
         UserDTO kakaoMember = this.ifNeedKakaoInfo(kakaoInfo, response);
 
         if(kakaoMember != null) {
-            session.setAttribute("kakaoToken", kakaoAccessToken);
+            session.setAttribute(CommonUtils.KAKAO_TOKEN, kakaoAccessToken);
             redirectAttributes.addFlashAttribute("user", kakaoMember);
-            redirectAttributes.addFlashAttribute("social", CommonUtil.KAKAO);
+            redirectAttributes.addFlashAttribute("social", KAKAO);
         }
     }
 
@@ -79,8 +81,8 @@ public class KakaoServiceImpl implements SocialService {
 
         String infoResponse = WebClient.create(kakaoUserInfoUri).post()
                 .uri("")
-                .header("Authorization", "Bearer " + accessToken)
-                .header("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
+                .header("Authorization", CommonUtils.TOKEN_BEARER + accessToken)
+                .header("Content-Type", contentTypeUrlEncoded)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.error(new RuntimeException("Invalid Parameter")))
                 .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.error(new RuntimeException("Internal Server Error")))
@@ -100,16 +102,16 @@ public class KakaoServiceImpl implements SocialService {
 
     public UserDTO ifNeedKakaoInfo (KakaoInfoDTO kakaoInfo, HttpServletResponse response) {
         String kakaoId = kakaoInfo.getId();
-        Optional<UserDTO> kakaoMember = userRepository.findUserBySocialInfo(kakaoId, CommonUtil.KAKAO);
+        Optional<UserDTO> kakaoMember = userRepository.findUserBySocialInfo(kakaoId, KAKAO);
 
         // 회원가입
         if (kakaoMember.isEmpty()) {
             String tempPassword = passwordEncoder.encode(UUID.randomUUID().toString());
 
-            User newUser = new User(kakaoId, tempPassword, kakaoInfo.getNickname(), CommonUtil.KAKAO);
+            User newUser = new User(kakaoId, tempPassword, kakaoInfo.getNickname(), KAKAO);
             userRepository.save(newUser);
 
-            kakaoMember = userRepository.findUserBySocialInfo(kakaoId, CommonUtil.KAKAO);
+            kakaoMember = userRepository.findUserBySocialInfo(kakaoId, KAKAO);
         }
 
         SocialUtils.makeAuthAndSaveToken(new UserLogDetail(kakaoMember.get()), response);
@@ -120,18 +122,18 @@ public class KakaoServiceImpl implements SocialService {
     @Override
     public void signOut(HttpSession session, HttpServletRequest request, HttpServletResponse response) {
 
-        String accessToken = (String) session.getAttribute("kakaoToken");
-        String userLogId = request.getHeader(CommonUtil.USER_LOG_ID_NAME);
+        String accessToken = (String) session.getAttribute(CommonUtils.KAKAO_TOKEN);
+        String userLogId = request.getHeader(CommonUtils.USER_LOG_ID_NAME);
 
         if(accessToken != null && !"".equals(accessToken)){
-            String logoutId = WebClient.create("https://kapi.kakao.com/v1/user/logout").post()
+            String logoutId = WebClient.create(kakaoSignoutUri).post()
                     .uri(uriBuilder -> uriBuilder
                             .scheme("https")
                             .path("")
                             .queryParam("target_id_type", "user_id")
                             .queryParam("target_id", userLogId)
                             .build(true))
-                    .header("Authorization", "Bearer " + accessToken)
+                    .header("Authorization", CommonUtils.TOKEN_BEARER + accessToken)
                     .retrieve()
                     .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.error(new RuntimeException("Invalid Parameter")))
                     .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.error(new RuntimeException("Internal Server Error")))

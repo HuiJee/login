@@ -1,7 +1,7 @@
 package com.hjpj.login.auth.jwt;
 
 import com.hjpj.login.user.dto.UserLogDetail;
-import com.hjpj.login.common.CommonUtil;
+import com.hjpj.login.common.CommonUtils;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -53,8 +53,8 @@ public class JwtGenerator {
     public String generateToken(String authorities, UserLogDetail userLogDetail, long validTime) {
         return Jwts.builder()
                 .setSubject(userLogDetail.getUserLogId())
-                .claim(CommonUtil.AUTH_NAME, authorities)
-                .claim(CommonUtil.USER_LOG_ID_NAME, userLogDetail.getUserLogId())
+                .claim(CommonUtils.AUTH_NAME, authorities)
+                .claim(CommonUtils.USER_LOG_ID_NAME, userLogDetail.getUserLogId())
                 .setExpiration(new Date(System.currentTimeMillis() + validTime))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();

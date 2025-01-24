@@ -1,7 +1,7 @@
 package com.hjpj.login.user.service;
 
 import com.hjpj.login.auth.jwt.JwtUtil;
-import com.hjpj.login.common.CommonUtil;
+import com.hjpj.login.common.CommonUtils;
 import com.hjpj.login.exception.CustomException;
 import com.hjpj.login.exception.ErrorCode;
 import com.hjpj.login.user.dto.LoginInfoDTO;
@@ -43,7 +43,7 @@ public interface LoginService {
     /** 로그 아웃 시 토큰 정리 */
     default void clearSessionAndCookies(HttpServletRequest request, HttpServletResponse response) {
         // Redis 토큰 삭제
-        String userLogId = request.getHeader(CommonUtil.USER_LOG_ID_NAME);
+        String userLogId = request.getHeader(CommonUtils.USER_LOG_ID_NAME);
         if (userLogId != null) {
             // Redis 삭제 로직 호출
             deleteTokenFromRedis(userLogId);
@@ -53,7 +53,7 @@ public interface LoginService {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(CommonUtil.ACCESS_TOKEN)) {
+                if (cookie.getName().equals(CommonUtils.ACCESS_TOKEN)) {
                     cookie.setValue("");
                     cookie.setPath("/");
                     cookie.setMaxAge(0);

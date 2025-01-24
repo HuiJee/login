@@ -115,8 +115,6 @@
                 }
             });
 
-            console.log('response : ', response);
-
             if(response.ok) {
                 const user = await response.json();
                 localStorage.setItem('userId', user.userId);

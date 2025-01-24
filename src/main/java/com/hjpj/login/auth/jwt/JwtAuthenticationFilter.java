@@ -1,6 +1,6 @@
 package com.hjpj.login.auth.jwt;
 
-import com.hjpj.login.common.CommonUtil;
+import com.hjpj.login.common.CommonUtils;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -42,6 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 인증 예외 경로가 아닌 경우 access 토큰 확인
         String accessToken = jwtProvider.getTokenFromCookie(request);
         if(accessToken == null) {
+            System.out.println("requestURI: " + requestURI);
             System.out.println("AccessToken 존재하지 않음");
             // AccessToken 발급을 위해 401 전송
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Missing access token");
@@ -51,8 +52,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // StringUtils.hasText : NULL 이거나 "" 이거나 공백만 포함하고 있으면 false 반환
         if(StringUtils.hasText(accessToken) && jwtProvider.validateToken(accessToken)) {
             Claims claims = jwtProvider.parseClaims(accessToken);
-            String userLogIdFromToken = (String) claims.get(CommonUtil.USER_LOG_ID_NAME);
-            String userLogId = request.getHeader(CommonUtil.USER_LOG_ID_NAME);
+            String userLogIdFromToken = (String) claims.get(CommonUtils.USER_LOG_ID_NAME);
+            String userLogId = request.getHeader(CommonUtils.USER_LOG_ID_NAME);
 
             if(!Objects.equals(userLogIdFromToken, userLogId)) {
                 System.out.println("토큰 ID : " + userLogIdFromToken + " / 헤더 ID : " + userLogId + " => 불일치!");
@@ -88,8 +89,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 requestURI.contains("/bootstrap/") ||
                 requestURI.contains("/fonts/") ||
                 requestURI.contains("/images/") ||
-                requestURI.contains("/icons/") ;
-//                requestURI.contains("/favicon.ico");
+                requestURI.contains("/icons/") ||
+                requestURI.contains("/favicon.ico");
     }
 
 }

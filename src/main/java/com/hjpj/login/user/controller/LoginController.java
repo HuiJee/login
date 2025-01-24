@@ -3,7 +3,7 @@ package com.hjpj.login.user.controller;
 import com.hjpj.login.user.dto.LoginInfoDTO;
 import com.hjpj.login.user.entity.User;
 import com.hjpj.login.user.service.LoginServiceImpl;
-import com.hjpj.login.common.CommonUtil;
+import com.hjpj.login.common.CommonUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -27,7 +27,7 @@ public class LoginController {
     @PostMapping("find/{findTarget}")
     public ResponseEntity<?> findIdOrPw(@PathVariable String findTarget,
                                         @RequestBody User user) {
-        Map<String, String> result = Objects.equals(findTarget, CommonUtil.FIND_ID) ?
+        Map<String, String> result = Objects.equals(findTarget, CommonUtils.FIND_ID) ?
                 loginService.findUserId(user) : loginService.findUserPw(user);
 
         return ResponseEntity.ok(result);
