@@ -184,7 +184,8 @@ LocalStorage에 있는 [기억하기]를 제외한 모든 정보를 삭제 후 �
 - 자체 토큰을 별도로 발급하여 세션 유지 등의 기능을 실행
 
 <br>
-👉 단순 로그아웃
+👉 <b>단순 로그아웃</b>
+
 카카오에서 기본적으로 제공하는 단순 로그아웃 api는 요청 파라미터에 admin key를 넣지 않으면, accessToken은 만료하지만 재 로그인 시 기존 계정으로 자동 로그인 됨.
 
 https://github.com/user-attachments/assets/a1f52216-4c37-4ee4-9141-1c8de682d136
@@ -193,7 +194,8 @@ https://github.com/user-attachments/assets/a1f52216-4c37-4ee4-9141-1c8de682d136
 
 
 <br>
-👉 카카오 계정 로그아웃
+👉 <b>카카오 계정 로그아웃</b>
+
 하지만 계정까지 로그아웃하는 api를 사용하면 로그아웃 시 로그아웃 방식을 선택할 수 있다.
 
 https://github.com/user-attachments/assets/14b87f64-c23c-4f44-8d07-6b1a3cf84ac0
